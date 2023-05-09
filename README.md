@@ -48,3 +48,10 @@ JSの勉強：5/15〆切
 メイン機能実装：5/30〆切
 β版をRUNTEQ内リリース（MVP）：6/5〆切
 本番リリース：6月中旬
+
+■画面遷移図
+
+Figma;
+https://www.figma.com/file/L0RpZeERJHlOjxBs6HKg6T/%E3%82%8A%E3%83%BC%E3%81%A9%E3%81%BF%E3%83%BC%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3?type=design&node-id=0%3A1&t=QDIBh9qhLFArD4o4-1
+
+
