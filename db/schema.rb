@@ -44,15 +44,7 @@ ActiveRecord::Schema.define(version: 2023_05_23_123201) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "image_texts", force: :cascade do |t|
-    t.string "answer1"
-    t.string "answer2"
-    t.string "answer3"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "simple_profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "image_texts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "answer1"
     t.string "answer2"
     t.string "answer3"
