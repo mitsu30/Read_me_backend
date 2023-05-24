@@ -1,9 +1,41 @@
 class Api::V1::ImageTextsController < ApplicationController
   require 'mini_magick'
+  require 'base64' # 追加
+
+  def preview
+    image_text = ImageText.new(answer1: params[:answer1], answer2: params[:answer2], answer3: params[:answer3])
+    image = generate_image(image_text)
+
+    temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
+    image.write(temp_image_path)
+
+    encoded_image = Base64.encode64(File.open(temp_image_path).read) # 追加
+    File.delete(temp_image_path) # 追加
+
+    render json: { url: "data:image/jpg;base64,#{encoded_image}" } # 変更
+  end
 
   def create
     image_text = ImageText.new(answer1: params[:answer1], answer2: params[:answer2], answer3: params[:answer3])
-      
+    image = generate_image(image_text)
+
+    temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
+    image.write(temp_image_path)
+
+    image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
+
+    if image_text.save
+      File.delete(temp_image_path) # 追加
+      render json: { url: url_for(image_text.image) }
+    else
+      File.delete(temp_image_path) # 追加
+      render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def generate_image(image_text)
     # MiniMagickを使って画像を読み込む。
     image = MiniMagick::Image.open(Rails.root.join('public', 'images', 'template1.png'))
 
@@ -18,21 +50,6 @@ class Api::V1::ImageTextsController < ApplicationController
       c.fill 'black'
     end
 
-    # テキストが追加された画像を一時的なファイルに保存する。
-    temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
-    image.write(temp_image_path)
-
-    # 画像をActiveStorageにアップロードします。
-    image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
-
-    # 一時ファイルを削除する。
-    File.delete(temp_image_path)
-
-    if image_text.save
-      render json: { url: url_for(image_text.image) }
-    else
-      render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
-    end
+    image
   end
 end
-
