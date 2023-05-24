@@ -1,0 +1,2 @@
+class SimpleProfile < ApplicationRecord
+end
