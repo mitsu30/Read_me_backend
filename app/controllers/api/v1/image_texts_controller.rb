@@ -33,6 +33,15 @@ class Api::V1::ImageTextsController < ApplicationController
     end
   end
 
+  def show
+    image_text = ImageText.find(params[:id])
+    if image_text
+      render json: { url: url_for(image_text.image) }
+    else
+      render json: { error: "Image not found" }, status: :not_found
+    end
+  end
+
   private
 
   def generate_image(image_text)
