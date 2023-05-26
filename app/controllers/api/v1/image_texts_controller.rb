@@ -26,7 +26,7 @@ class Api::V1::ImageTextsController < ApplicationController
 
     if image_text.save
       File.delete(temp_image_path) # 追加
-      render json: { url: url_for(image_text.image) }
+      render json: { url: url_for(image_text.image), id: image_text.id } # Include id in the response
     else
       File.delete(temp_image_path) # 追加
       render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
