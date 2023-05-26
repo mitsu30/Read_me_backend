@@ -3,7 +3,7 @@ class Api::V1::ImageTextsController < ApplicationController
   require 'base64' # 追加
 
   def preview
-    image_text = ImageText.new(answer1: params[:answer1], answer2: params[:answer2], answer3: params[:answer3])
+    image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
     image = generate_image(image_text)
 
     temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
@@ -16,7 +16,7 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   def create
-    image_text = ImageText.new(answer1: params[:answer1], answer2: params[:answer2], answer3: params[:answer3])
+    image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
     image = generate_image(image_text)
 
     temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
