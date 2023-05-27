@@ -18,31 +18,38 @@ class Api::V1::ImageTextsController < ApplicationController
   def create
     image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
   
-    if image_text.save
-      begin
-        image = generate_image(image_text)
-        temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
-        image.write(temp_image_path)
+    begin
+      image = generate_image(image_text)
+      temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
+      image.write(temp_image_path)
   
-        image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
-        File.delete(temp_image_path)
+      image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
+      File.delete(temp_image_path)
   
-        # Update the image_url attribute with the URL of the uploaded image
-        image_text.update!(image_url: rails_blob_url(image_text.image))
+      # Get the public URL of the uploaded image from S3
+      s3_client = Aws::S3::Client.new(region: ENV['AWS_REGION'])
+      s3_resource = Aws::S3::Resource.new(client: s3_client)
+      object = s3_resource.bucket(ENV['AWS_BUCKET']).object(image_text.image.key)
+      image_url = object.public_url
   
-        render json: { url: url_for(image_text.image), id: image_text.id }
-      rescue => e
-        render json: { errors: [e.message] }, status: :internal_server_error
+      # Save the ImageText object with the image_url
+      image_text.image_url = image_url
+      if image_text.save
+        render json: { url: image_url, id: image_text.id }
+      else
+        render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
       end
-    else
-      render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
+    rescue => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n") 
+      render json: { errors: [e.message] }, status: :internal_server_error
     end
   end
-
+  
   def show
-    @image_text = ImageText.find(params[:id])
-    if @image_text
-      render json: @image_text.image.url
+    image_text = ImageText.find(params[:id])
+    if image_text
+      render json: { image_url: image_text.image_url }
     else
       render json: { error: "Image not found" }, status: :not_found
     end
