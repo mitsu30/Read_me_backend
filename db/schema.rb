@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 2023_05_23_123201) do
     t.string "answer1"
     t.string "answer2"
     t.string "answer3"
+    t.string "image_url", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
