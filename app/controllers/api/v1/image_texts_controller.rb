@@ -18,20 +18,20 @@ class Api::V1::ImageTextsController < ApplicationController
   def create
     image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
   
-    # まずは ImageText オブジェクトを保存
     if image_text.save
       begin
-        # 例外が発生する可能性のあるコードを begin-end ブロック内に配置
         image = generate_image(image_text)
         temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
         image.write(temp_image_path)
-        
+  
         image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
         File.delete(temp_image_path)
-        
+  
+        # Update the image_url attribute with the URL of the uploaded image
+        image_text.update!(image_url: rails_blob_url(image_text.image))
+  
         render json: { url: url_for(image_text.image), id: image_text.id }
       rescue => e
-        # 何か問題が発生した場合は、そのエラーを捕捉し、エラーメッセージを返す
         render json: { errors: [e.message] }, status: :internal_server_error
       end
     else
@@ -40,9 +40,9 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   def show
-    image_text = ImageText.find(params[:id])
-    if image_text
-      render json: { url: url_for(image_text.image) }
+    @image_text = ImageText.find(params[:id])
+    if @image_text
+      render json: @image_text.image.url
     else
       render json: { error: "Image not found" }, status: :not_found
     end
