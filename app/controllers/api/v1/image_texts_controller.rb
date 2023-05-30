@@ -1,6 +1,10 @@
 class Api::V1::ImageTextsController < ApplicationController
   require 'mini_magick'
   require 'base64' 
+  
+  def wakeup
+    render json: { message: 'Server is awake' }
+  end
 
   def preview
     image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
