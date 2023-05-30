@@ -66,13 +66,38 @@ class Api::V1::ImageTextsController < ApplicationController
     image.combine_options do |c|
       c.gravity 'North'
       c.pointsize '32'
-      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')  
-      c.draw "text 0,180 '#{image_text.answer1}'"
-      c.draw "text 0,325 '#{image_text.answer2}'"
-      c.draw "text 0,475 '#{image_text.answer3}'"
+      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf') 
       c.fill 'black'
-    end
+      # c.draw "text 0,180 '#{image_text.answer1}'"
+      c.annotate '-268+212', image_text.answer1
+      c.annotate '+271+212', image_text.answer2
 
+      lines = image_text.answer3.split("\n")
+      byebug
+      lines.each_with_index do |line, index|
+        # Adjust the text position based on the line count
+        text_position = case lines.size
+        when 1
+          # Adjust the position for 1 line text
+          "0,#{426 + index * 32}"
+        when 2
+          # Adjust the position for 2 line text
+          "0,#{408 + index * 32}"
+        when 3
+          # Adjust the position for 3 line text
+          "0,#{390 + index * 32}"
+        end
+  
+        image.combine_options do |c|
+          c.gravity 'North'
+          c.pointsize '32'
+          c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')
+          c.fill 'black'
+          c.draw "text #{text_position} '#{line}'"
+        end
+      end
+    end
+    
     image
   end
 end
