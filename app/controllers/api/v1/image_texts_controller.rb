@@ -73,7 +73,6 @@ class Api::V1::ImageTextsController < ApplicationController
       c.annotate '+271+212', image_text.answer2
 
       lines = image_text.answer3.split("\n")
-      byebug
       lines.each_with_index do |line, index|
         # Adjust the text position based on the line count
         text_position = case lines.size
