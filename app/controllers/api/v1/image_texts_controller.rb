@@ -66,13 +66,27 @@ class Api::V1::ImageTextsController < ApplicationController
     image.combine_options do |c|
       c.gravity 'North'
       c.pointsize '32'
-      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')  
-      c.draw "text 0,180 '#{image_text.answer1}'"
-      c.draw "text 0,325 '#{image_text.answer2}'"
-      c.draw "text 0,475 '#{image_text.answer3}'"
+      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf') 
       c.fill 'black'
+      # c.draw "text 0,180 '#{image_text.answer1}'"
+      c.annotate '-268+212', image_text.answer1
     end
 
+    image.combine_options do |c|
+      c.gravity 'North'
+      c.pointsize '32'
+      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')  
+      c.annotate '+271+212', image_text.answer2
+    end
+
+    image.combine_options do |c|
+      c.gravity 'North'
+      c.pointsize '32'
+      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')  
+      c.fill 'black'
+      c.annotate '+556+160', image_text.answer3
+    end
+    
     image
   end
 end
