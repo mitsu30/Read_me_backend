@@ -64,22 +64,21 @@ class Api::V1::ImageTextsController < ApplicationController
         s3_resource = Aws::S3::Resource.new(client: s3_client)
   
         # S3のバケットを取得
-        bucket = s3_resource.bucket(ENV['AWS_BUCKET_NAME'])
+        bucket = s3_resource.bucket(ENV['AWS_BUCKET'])
   
         # ファイル名を生成（ここではUUIDを使用）
         filename = SecureRandom.uuid + '.jpg'
         
         # S3に画像をアップロード
-        obj = bucket.put_object(key: filename, body: image.to_blob, acl: 'public-read')
-  
+        obj = bucket.put_object(key: filename, body: image.to_blob)
         # S3の公開URLを生成
-        image_url = "https://#{ENV['AWS_BUCKET_NAME']}.s3.#{ENV['AWS_REGION']}.amazonaws.com/#{filename}"
+        image_url = "https://#{ENV['AWS_BUCKET']}.s3.#{ENV['AWS_REGION']}.amazonaws.com/#{filename}"
   
         # URLを設定して保存
         image_text.image_url = image_url
         image_text.save!
       end
-      render json: { status: 'success', message: 'Image created successfully.', url: image_url, id: image_text.id }
+      render json: { status: 'success', message: 'Image created successfully.', url: image_text.image_url, id: image_text.id }
     rescue => e
       Rails.logger.error e.message
       Rails.logger.error e.backtrace.join("\n") 
