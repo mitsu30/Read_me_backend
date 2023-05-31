@@ -19,37 +19,70 @@ class Api::V1::ImageTextsController < ApplicationController
     render json: { url: "data:image/jpg;base64,#{encoded_image}" } 
   end
 
+  # def create
+  #   image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
+  
+  #   begin
+  #     image = generate_image(image_text)
+  #     temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
+  #     image.write(temp_image_path)
+  
+  #     image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
+  #     File.delete(temp_image_path)
+  
+  #     # Get the public URL of the uploaded image from S3
+  #     s3_client = Aws::S3::Client.new(region: ENV['AWS_REGION'])
+  #     s3_resource = Aws::S3::Resource.new(client: s3_client)
+  #     object = s3_resource.bucket(ENV['AWS_BUCKET']).object(image_text.image.key)
+  #     image_url = object.public_url
+  
+  #     # Save the ImageText object with the image_url
+  #     image_text.image_url = image_url
+  #     if image_text.save
+  #       render json: { url: image_url, id: image_text.id }
+  #     else
+  #       render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
+  #     end
+  #   rescue => e
+  #     Rails.logger.error e.message
+  #     Rails.logger.error e.backtrace.join("\n") 
+  #     render json: { errors: [e.message] }, status: :internal_server_error
+  #   end
+  # end
+  
   def create
-    image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
+    image_text = ImageText.new(image_text_params)
   
     begin
-      image = generate_image(image_text)
-      temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
-      image.write(temp_image_path)
+      # トランザクションを開始
+      ActiveRecord::Base.transaction do
+        # 一時的にダミーのURLを設定
+        image_text.image_url = "dummy_url"
   
-      image_text.image.attach(io: File.open(temp_image_path), filename: 'temp_image.jpg')
-      File.delete(temp_image_path)
+        # ImageTextインスタンスを保存
+        image_text.save!
   
-      # Get the public URL of the uploaded image from S3
-      s3_client = Aws::S3::Client.new(region: ENV['AWS_REGION'])
-      s3_resource = Aws::S3::Resource.new(client: s3_client)
-      object = s3_resource.bucket(ENV['AWS_BUCKET']).object(image_text.image.key)
-      image_url = object.public_url
+        # 画像生成
+        image = generate_image(image_text)
   
-      # Save the ImageText object with the image_url
-      image_text.image_url = image_url
-      if image_text.save
-        render json: { url: image_url, id: image_text.id }
-      else
-        render json: { errors: image_text.errors.full_messages }, status: :unprocessable_entity
+        # 画像をアタッチ
+        image_text.image.attach(io: StringIO.new(image.to_blob), filename: 'temp_image.jpg')
+  
+        # 実際のURLを取得
+        image_url = Rails.application.routes.url_helpers.rails_blob_path(image_text.image, only_path: true)
+  
+        # 実際のURLで更新
+        image_text.update!(image_url: image_url)
       end
+  
+      render json: { status: 'success', message: 'Image created successfully.', url: image_url, id: image_text.id }
     rescue => e
       Rails.logger.error e.message
       Rails.logger.error e.backtrace.join("\n") 
-      render json: { errors: [e.message] }, status: :internal_server_error
+      render json: { status: 'error', message: e.message }, status: :internal_server_error
     end
   end
-  
+
   def show
     image_text = 
     ImageText.find(params[:id])
@@ -61,6 +94,10 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   private
+
+  def image_text_params
+    params.require(:image_text).permit(:answer1, :answer2, :answer3)
+  end
 
   def generate_image(image_text)
     # MiniMagickを使って画像を読み込む。
