@@ -13,7 +13,7 @@ class ImageText < ApplicationRecord
     lines = answer3.split("\n")
     if lines.length > 3
       errors.add(:answer3, '3行以内で入力してください。')
-    elsif lines.any? { |line| line.length > 32 }
+    elsif lines.any? { |line| line.length > 26 }
       errors.add(:answer3, '各行26文字以内で入力してください。')
     end
   end
