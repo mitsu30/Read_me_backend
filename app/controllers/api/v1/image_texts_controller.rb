@@ -51,30 +51,34 @@ class Api::V1::ImageTextsController < ApplicationController
   # end
   
   def create
+    Rails.logger.debug ENV['AWS_BUCKET'] 
     image_text = ImageText.new(image_text_params)
   
     begin
-      # トランザクションを開始
       ActiveRecord::Base.transaction do
-        # 一時的にダミーのURLを設定
-        image_text.image_url = "dummy_url"
-  
-        # ImageTextインスタンスを保存
-        image_text.save!
-  
         # 画像生成
         image = generate_image(image_text)
   
-        # 画像をアタッチ
-        image_text.image.attach(io: StringIO.new(image.to_blob), filename: 'temp_image.jpg')
+        # S3リソースの初期化
+        s3_client = Aws::S3::Client.new(region: ENV['AWS_REGION'])
+        s3_resource = Aws::S3::Resource.new(client: s3_client)
   
-        # 実際のURLを取得
-        image_url = Rails.application.routes.url_helpers.rails_blob_path(image_text.image, only_path: true)
+        # S3のバケットを取得
+        bucket = s3_resource.bucket(ENV['AWS_BUCKET_NAME'])
   
-        # 実際のURLで更新
-        image_text.update!(image_url: image_url)
+        # ファイル名を生成（ここではUUIDを使用）
+        filename = SecureRandom.uuid + '.jpg'
+        
+        # S3に画像をアップロード
+        obj = bucket.put_object(key: filename, body: image.to_blob, acl: 'public-read')
+  
+        # S3の公開URLを生成
+        image_url = "https://#{ENV['AWS_BUCKET_NAME']}.s3.#{ENV['AWS_REGION']}.amazonaws.com/#{filename}"
+  
+        # URLを設定して保存
+        image_text.image_url = image_url
+        image_text.save!
       end
-  
       render json: { status: 'success', message: 'Image created successfully.', url: image_url, id: image_text.id }
     rescue => e
       Rails.logger.error e.message
@@ -106,12 +110,12 @@ class Api::V1::ImageTextsController < ApplicationController
     # 画像にテキストを追加する。
     image.combine_options do |c|
       c.gravity 'North'
-      c.pointsize '32'
+      c.pointsize '40'
       c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf') 
-      c.fill 'black'
+      c.fill '#666666'
       # c.draw "text 0,180 '#{image_text.answer1}'"
-      c.annotate '-268+212', image_text.answer1
-      c.annotate '+271+212', image_text.answer2
+      c.annotate '-268+207', image_text.answer1
+      c.annotate '+271+207', image_text.answer2
 
       lines = image_text.answer3.split("\n")
       lines.each_with_index do |line, index|
@@ -119,20 +123,20 @@ class Api::V1::ImageTextsController < ApplicationController
         text_position = case lines.size
         when 1
           # Adjust the position for 1 line text
-          "0,#{426 + index * 32}"
+          "0,#{418 + index * 40}"
         when 2
           # Adjust the position for 2 line text
-          "0,#{408 + index * 32}"
+          "0,#{396 + index * 40}"
         when 3
           # Adjust the position for 3 line text
-          "0,#{390 + index * 32}"
+          "0,#{380 + index * 40}"
         end
   
         image.combine_options do |c|
           c.gravity 'North'
-          c.pointsize '32'
+          c.pointsize '40'
           c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')
-          c.fill 'black'
+          c.fill '#666666'
           c.draw "text #{text_position} '#{line}'"
         end
       end
