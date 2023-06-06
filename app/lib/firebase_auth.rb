@@ -28,7 +28,7 @@ module FirebaseAuth
       public_key = get_public_key(header)
       p public_key
       # 公開鍵を使ってIDトークンを検証する
-      error = verify(id_token, public_key)
+      errors = verify(id_token, public_key)
     
 
       # token検証に成功したら、ユーザーuidを返し、失敗したら、error情報を返す。
