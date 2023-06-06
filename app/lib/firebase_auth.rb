@@ -22,12 +22,17 @@ module FirebaseAuth
     def verify_id_token(id_token)
       # トークンをデコードしてペイロードとヘッダーを取得する
       payload, header = decode_unverified(id_token)
+      p payload
+      p header
       # 取得したヘッダーを使って公開鍵を取得する
       public_key = get_public_key(header)
+      p public_key
       # 公開鍵を使ってIDトークンを検証する
       error = verify(id_token, public_key)
-      
+    
+
       # token検証に成功したら、ユーザーuidを返し、失敗したら、error情報を返す。
+    
       if errors.empty?
         return { uid: payload["user_id"] }
       else

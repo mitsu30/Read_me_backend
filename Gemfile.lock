@@ -85,6 +85,10 @@ GEM
     date (3.3.3)
     dockerfile-rails (1.2.5)
       rails
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     erubi (1.12.0)
     ffi (1.15.5)
     globalid (1.1.0)
@@ -200,6 +204,7 @@ DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
   dockerfile-rails (>= 1.2)
+  dotenv-rails
   image_processing (~> 1.2)
   jwt
   listen (~> 3.3)
