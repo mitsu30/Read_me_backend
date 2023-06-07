@@ -25,13 +25,14 @@ module FirebaseAuth
       # 取得したヘッダーを使って公開鍵を取得する
       public_key = get_public_key(header)
       # 公開鍵を使ってIDトークンを検証する
+
       errors = verify(id_token, public_key)
     
 
       # token検証に成功したら、ユーザーuidを返し、失敗したら、error情報を返す。
     
       if errors.empty?
-        return { uid: payload["user_id"] }
+        return { uid: payload["user_id"], email: payload["email"]}
       else
         return { errors: errors.join(" / ") }
       end
@@ -167,7 +168,7 @@ module FirebaseAuth
       }
     end
   end
-  
+
     
 
 
