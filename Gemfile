@@ -47,4 +47,5 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'seed-fu'
 gem 'aws-sdk-s3'
+gem "octokit"
 gem "dockerfile-rails", ">= 1.2", :group => :development
