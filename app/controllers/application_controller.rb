@@ -15,31 +15,10 @@ class ApplicationController < ActionController::API
       if result[:errors]
         render_400(nil, result[:errors])
       else
-        # ユーザーのemailが組織のメンバーのものであるか確認
-        if member_email_of_organization?(result[:email], 'runteq')
-          @_current_user = User.find_or_create_by!(uid: result[:uid])
-        else
-          render_400(nil, 'User email is not found in the specified organization.')
-        end
+        @_current_user = User.find_or_create_by!(uid: result[:uid])
+      else
+        render_400(nil, 'User email is not found in the specified organization.')
       end
-    end
-  end
-
-  # 特定の組織のメンバー情報を取得する
-  def organization_members(organization_name)
-    client = Octokit::Client.new(access_token: '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')
-    client.auto_paginate = true
-    client.organization_members(organization_name).map(&:login)
-  end
-
-  # 指定したユーザーのemailが組織のメンバーのものであるか確認する
-  def member_email_of_organization?(email, organization_name)
-    members = organization_members(organization_name)
-    client = Octokit::Client.new(access_token: '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')
-    byebug
-    members.any? do |member|
-      user = client.user(member)
-      user.email == email
     end
   end
 
@@ -47,3 +26,6 @@ class ApplicationController < ActionController::API
     @_current_user
   end
 end
+
+
+# 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

@@ -25,7 +25,6 @@ module FirebaseAuth
       # 取得したヘッダーを使って公開鍵を取得する
       public_key = get_public_key(header)
       # 公開鍵を使ってIDトークンを検証する
-      byebug
       errors = verify(id_token, public_key)
     
 
