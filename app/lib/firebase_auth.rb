@@ -31,7 +31,7 @@ module FirebaseAuth
       # token検証に成功したら、ユーザーuidを返し、失敗したら、error情報を返す。
     
       if errors.empty?
-        return { uid: payload["user_id"], email: payload["email"]}
+        return { uid: payload["user_id"] }
       else
         return { errors: errors.join(" / ") }
       end
