@@ -10,18 +10,29 @@ class ApplicationController < ActionController::API
   def authenticate_token
     authenticate_with_http_token do |token, _options|
       result = verify_id_token(token)
-      byebug
+      Rails.logger.info "Authentication result: #{result}"
       if result[:errors]
         render_400(nil, result[:errors])
       else
         user = User.find_by(uid: result[:uid])
-        byebug
         if user.present? 
           @_current_user = user
-        elsif params[:isNewUser] && runteq_member?(params[:username])
-          @_current_user = User.create(uid: result[:uid])
+        elsif params[:isNewUser]
+          # Rails.logger.info "isNewUser parameter: #{params[:isNewUser]}"
+          is_member = runteq_member?(params[:username])
+          # Rails.logger.info "#{params[:username]} is a member of runteq: #{is_member}"
+          if is_member
+            begin
+              @_current_user = User.create!(uid: result[:uid], name: params[:username], is_student: true)
+            rescue => e
+              # Rails.logger.error "User creation failed: #{e.message}"
+              render json: { status: 'ERROR', message: 'User creation failed: ' + e.message}
+            end
+          else
+            render json: { status: 'ERROR', message: 'Not a runteq member'}
+          end
         else
-          render_400(nil, 'User is not a member of the specified organization or user not found.')
+          render json: { status: 'ERROR', message: 'isNewUser is false or undefined'}
         end
       end
     end
@@ -33,10 +44,11 @@ class ApplicationController < ActionController::API
 
   private
 
-  def runteq_member?(gitHub_user_id)
+  def runteq_member?(github_user_id)
     client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
-    client.organization_member?('runteq', gitHub_user_id)
-    byebug
+    is_member = client.organization_member?('runteq', github_user_id)
+    # Rails.logger.info "Checked if #{github_user_id} is a member of runteq: #{is_member}"
+    is_member
   end
 
 end
