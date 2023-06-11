@@ -5,4 +5,6 @@ class User < ApplicationRecord
   validates :is_student, presence: true
 
   enum role: { general: 0, admin: 1 }
+
+  has_one_attached :avatar
 end
