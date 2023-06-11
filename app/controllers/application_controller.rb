@@ -24,7 +24,7 @@ class ApplicationController < ActionController::API
           if is_member
             begin
               @_current_user = User.create!(uid: result[:uid], name: params[:username], is_student: true)
-              render json: { username: params[:username] }
+              render json: { status: 'success', message: 'User created successfully.', id: @_current_user.id, username: @_current_user.name }
             rescue => e
               Rails.logger.error "User creation failed: #{e.message}"
               render json: { status: 'ERROR', message: 'User creation failed: ' + e.message}
