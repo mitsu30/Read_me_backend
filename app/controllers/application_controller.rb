@@ -18,14 +18,15 @@ class ApplicationController < ActionController::API
         if user.present? 
           @_current_user = user
         elsif params[:isNewUser]
-          # Rails.logger.info "isNewUser parameter: #{params[:isNewUser]}"
+          Rails.logger.info "isNewUser parameter: #{params[:isNewUser]}"
           is_member = runteq_member?(params[:username])
-          # Rails.logger.info "#{params[:username]} is a member of runteq: #{is_member}"
+          Rails.logger.info "#{params[:username]} is a member of runteq: #{is_member}"
           if is_member
             begin
               @_current_user = User.create!(uid: result[:uid], name: params[:username], is_student: true)
+              render json: { username: params[:username] }
             rescue => e
-              # Rails.logger.error "User creation failed: #{e.message}"
+              Rails.logger.error "User creation failed: #{e.message}"
               render json: { status: 'ERROR', message: 'User creation failed: ' + e.message}
             end
           else
@@ -47,7 +48,7 @@ class ApplicationController < ActionController::API
   def runteq_member?(github_user_id)
     client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
     is_member = client.organization_member?('runteq', github_user_id)
-    # Rails.logger.info "Checked if #{github_user_id} is a member of runteq: #{is_member}"
+    Rails.logger.info "Checked if #{github_user_id} is a member of runteq: #{is_member}"
     is_member
   end
 
