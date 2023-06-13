@@ -1,0 +1,2 @@
+class UserCommunity < ApplicationRecord
+end
