@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_13_130316) do
+ActiveRecord::Schema.define(version: 2023_06_13_130654) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -80,6 +80,15 @@ ActiveRecord::Schema.define(version: 2023_06_13_130316) do
     t.index ["user_id"], name: "index_user_communities_on_user_id"
   end
 
+  create_table "user_groups", force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.bigint "group_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["group_id"], name: "index_user_groups_on_group_id"
+    t.index ["user_id"], name: "index_user_groups_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.string "uid", null: false
@@ -95,4 +104,6 @@ ActiveRecord::Schema.define(version: 2023_06_13_130316) do
   add_foreign_key "groups", "communities"
   add_foreign_key "user_communities", "communities"
   add_foreign_key "user_communities", "users"
+  add_foreign_key "user_groups", "groups"
+  add_foreign_key "user_groups", "users"
 end
