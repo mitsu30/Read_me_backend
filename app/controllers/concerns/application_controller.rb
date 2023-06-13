@@ -14,7 +14,6 @@ class ApplicationController < ActionController::API
       if result[:errors]
         render_400(nil, result[:errors])
       else
-        byebug
         user = User.find_by(uid: result[:uid])
         if user.present? 
           @_current_user = user
