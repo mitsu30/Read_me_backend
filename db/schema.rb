@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_13_124545) do
+ActiveRecord::Schema.define(version: 2023_06_13_130316) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -54,6 +54,14 @@ ActiveRecord::Schema.define(version: 2023_06_13_124545) do
     t.index ["owner_id"], name: "index_communities_on_owner_id"
   end
 
+  create_table "groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "community_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["community_id"], name: "index_groups_on_community_id"
+  end
+
   create_table "image_texts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "answer1"
     t.string "answer2"
@@ -84,6 +92,7 @@ ActiveRecord::Schema.define(version: 2023_06_13_124545) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "communities", "users", column: "owner_id"
+  add_foreign_key "groups", "communities"
   add_foreign_key "user_communities", "communities"
   add_foreign_key "user_communities", "users"
 end
