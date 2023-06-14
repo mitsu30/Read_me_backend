@@ -5,9 +5,12 @@ class Api::V1::UsersController < ApplicationController
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       
+      community = Community.find(1)
+      user.take_part_in(community)
+
       group = Group.find(params[:group_id])
       user.join(group)
-
+      
       user.avatar.attach(params[:avatar]) if params[:avatar].present?
     end
 
