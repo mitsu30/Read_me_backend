@@ -1,17 +1,21 @@
 class Api::V1::UsersController < ApplicationController
-  def update
+  def resister_new_RUNTEQ_student
     user = current_user
-    if user_params[:avatar].blank? 
-      user.avatar.attach(io: File.open(Rails.root.join('public', 'images', 'default_avatar.png')), filename: 'default-avatar.jpg') 
-    else
-      user.update(user_params)
+
+    ActiveRecord::Base.transaction do
+      user.update!(user_params)
+      
+      group = Group.find(params[:group_id])
+      user.join(group)
+
+      user.avatar.attach(params[:avatar]) if params[:avatar].present?
     end
 
-    if user.save
-      render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
-    else
-      render json: { status: 'ERROR', message: 'Not updated', data: user.errors }
-    end
+    render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
+  rescue ActiveRecord::RecordNotFound
+    render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
   end
 
   def show

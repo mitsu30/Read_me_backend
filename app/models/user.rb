@@ -14,4 +14,13 @@ class User < ApplicationRecord
   enum role: { general: 0, admin: 1 }
 
   has_one_attached :avatar
+
+  def take_part_in(community)
+    membered_communities << community
+  end
+
+  def join(group)
+    membered_groups << group
+  end
+  
 end
