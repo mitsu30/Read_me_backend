@@ -1,6 +1,7 @@
-User.seed(
-  :id,
-  { id: 1, name: 'admin', uid: 'sample1@exapmle.com', role: :admin, is_student: :true},
-  { id: 2, name: 'RUNTEQ', uid: 'sample2@exapmle.com', role: :general, is_student: :true},
-  { id: 3, name: 'NORMAL', uid: 'sample3@exapmle.com', role: :general, is_student: :false},
-)
+User.seed do |s|
+  s.id = "fbad5df1-dcd8-40fd-b4df-cbc5407807fd"
+  s.name = "operation"
+  s.uid = "V8RP1QIUm7Pe8raVk0rXfwGjhr72"
+  s.role = :admin
+  s.is_student = true
+end
