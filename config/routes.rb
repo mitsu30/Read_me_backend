@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       resources :users, only: [:update, :show]
 
       post "/auth", to: "authentications#create"
+      get '/groups/for_community/:community_id', to: 'groups#for_community'
     end
   end
 end
