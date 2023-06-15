@@ -28,6 +28,10 @@ class Api::V1::UsersController < ApplicationController
     if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
       users = users.where(user_groups: { group_id: params[:group_id] })
     end
+
+    if params[:name].present?
+      users = users.where('users.name LIKE ?', "%#{params[:name]}%")
+    end
   
     users = users.order(order_params)
                  .page(params[:page])
