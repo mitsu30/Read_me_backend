@@ -24,10 +24,13 @@ class Api::V1::UsersController < ApplicationController
   def index
     users = User.includes(:user_groups, :membered_groups, :user_communities)
                 .where(user_communities: { community_id: 1 })
-                .order(order_params)
-                .page(params[:page])
-                .per(10)
-
+  
+    users = users.where(user_groups: { group_id: params[:group_id] }) if params[:group_id].present?
+  
+    users = users.order(order_params)
+                 .page(params[:page])
+                 .per(10)
+  
     render json: users.map { |user| user_to_json(user) }
   end
 
