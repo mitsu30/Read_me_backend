@@ -24,8 +24,10 @@ class Api::V1::UsersController < ApplicationController
   def index
     users = User.includes(:user_groups, :membered_groups, :user_communities)
                 .where(user_communities: { community_id: 1 })
-  
-    users = users.where(user_groups: { group_id: params[:group_id] }) if params[:group_id].present?
+
+    if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
+      users = users.where(user_groups: { group_id: params[:group_id] })
+    end
   
     users = users.order(order_params)
                  .page(params[:page])
