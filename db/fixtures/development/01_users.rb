@@ -4,4 +4,5 @@ User.seed do |s|
   s.uid = "V8RP1QIUm7Pe8raVk0rXfwGjhr72"
   s.role = :admin
   s.is_student = true
+  s.greeting = "よろしくだぞ！！！！"
 end

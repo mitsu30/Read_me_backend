@@ -54,7 +54,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :uid, :role, :is_student, :avatar)
+    params.require(:user).permit(:name, :uid, :role, :is_student, :avatar, :greeting)
   end
 
   def order_params
@@ -73,6 +73,7 @@ class Api::V1::UsersController < ApplicationController
     {
       id: user.id,
       name: user.name,
+      greeting: user.greeting,
       avatar: user.avatar.attached? ? url_for(user.avatar) : nil,
       group: user.membered_groups.find_by(community_id: 1).name
     }

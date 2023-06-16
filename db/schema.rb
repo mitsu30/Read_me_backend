@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(version: 2023_06_13_130654) do
     t.string "uid", null: false
     t.integer "role", default: 0, null: false
     t.boolean "is_student", default: false, null: false
+    t.string "greeting"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
