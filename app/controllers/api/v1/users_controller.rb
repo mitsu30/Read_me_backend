@@ -57,14 +57,6 @@ class Api::V1::UsersController < ApplicationController
     params.require(:user).permit(:name, :uid, :role, :is_student, :avatar, :greeting)
   end
 
-  # def order_params
-  #   if params[:sort_by] == "name"
-  #     "name #{sort_order}"
-  #   else
-  #     "users.created_at #{sort_order}"  
-  #   end
-  # end
-
   def order_params
     case params[:sort_by]
     when "name_asc"
@@ -75,11 +67,7 @@ class Api::V1::UsersController < ApplicationController
       "users.created_at desc"  
     end
   end
-
-  def sort_order
-    params[:order] == "desc" ? "desc" : "asc"
-  end
-
+  
   def user_to_json(user)
     {
       id: user.id,
@@ -89,5 +77,16 @@ class Api::V1::UsersController < ApplicationController
       group: user.membered_groups.find_by(community_id: 1).name
     }
   end
+  # def order_params
+  #   if params[:sort_by] == "name"
+  #     "name #{sort_order}"
+  #   else
+  #     "users.created_at #{sort_order}"  
+  #   end
+  # end
+  
+  # def sort_order
+  #   params[:order] == "desc" ? "desc" : "asc"
+  # end
 end
 

@@ -15,6 +15,21 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
+  def self.create_new_user(params, uid)
+    is_member = runteq_member?(params[:username])
+    if is_member
+      begin
+        user = User.create!(uid: uid, name: params[:username], is_student: true)
+        return { status: 'success', message: 'User created successfully.', user: user }
+      rescue => e
+        Rails.logger.error "User creation failed: #{e.message}"
+        return { status: 'error', message: 'User creation failed: ' + e.message }
+      end
+    else
+      return { status: 'error', message: 'Not a runteq member'}
+    end
+  end
+  
   def take_part_in(community)
     membered_communities << community
   end
@@ -23,4 +38,12 @@ class User < ApplicationRecord
     membered_groups << group
   end
   
+  private
+
+  def self.runteq_member?(github_user_id)
+    client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
+    is_member = client.organization_member?('runteq', github_user_id)
+    Rails.logger.info "Checked if #{github_user_id} is a member of runteq: #{is_member}"
+    is_member
+  end
 end
