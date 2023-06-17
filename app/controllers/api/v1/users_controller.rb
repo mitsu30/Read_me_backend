@@ -57,11 +57,22 @@ class Api::V1::UsersController < ApplicationController
     params.require(:user).permit(:name, :uid, :role, :is_student, :avatar, :greeting)
   end
 
+  # def order_params
+  #   if params[:sort_by] == "name"
+  #     "name #{sort_order}"
+  #   else
+  #     "users.created_at #{sort_order}"  
+  #   end
+  # end
+
   def order_params
-    if params[:sort_by] == "name"
-      "name #{sort_order}"
+    case params[:sort_by]
+    when "name_asc"
+      "users.name asc"
+    when "created_at_desc"
+      "users.created_at desc"
     else
-      "users.created_at #{sort_order}"  
+      "users.created_at desc"  
     end
   end
 
