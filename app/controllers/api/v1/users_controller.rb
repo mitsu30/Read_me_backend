@@ -41,9 +41,10 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
-    user = User.find(params[:id])
+    user = User.find_by(uid: params[:uid])
     if user
       user_data = user.attributes
+      byebug
       user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else

@@ -9,7 +9,7 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { maximum: 255 }
   validates :uid, presence: true, uniqueness: true
   validates :role, presence: true
-  validates :is_student, presence: true
+  validates :is_student, inclusion: { in: [true, false] }
 
   enum role: { general: 0, admin: 1 }
 
@@ -17,16 +17,12 @@ class User < ApplicationRecord
 
   def self.create_new_user(params, uid)
     is_member = runteq_member?(params[:username])
-    if is_member
-      begin
-        user = User.create!(uid: uid, name: params[:username], is_student: true)
-        return { status: 'success', message: 'User created successfully.', user: user }
-      rescue => e
-        Rails.logger.error "User creation failed: #{e.message}"
-        return { status: 'error', message: 'User creation failed: ' + e.message }
-      end
-    else
-      return { status: 'error', message: 'Not a runteq member'}
+    begin
+      user = User.create!(uid: uid, name: params[:username], is_student: is_member)
+      return { status: 'success', message: 'User created successfully.', user: user }
+    rescue => e
+      Rails.logger.error "User creation failed: #{e.message}"
+      return { status: 'error', message: 'User creation failed: ' + e.message }
     end
   end
   

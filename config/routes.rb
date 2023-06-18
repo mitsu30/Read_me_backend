@@ -5,7 +5,8 @@ Rails.application.routes.draw do
       post '/image_texts/preview', to: 'image_texts#preview'
       get '/wakeup', to: 'image_texts#wakeup'
 
-      resources :users, only: [:index, :show]
+      resources :users, only: [:index]
+      get '/users/:uid', to: 'users#show'
       post '/users/resister_new_RUNTEQ_student', to: 'users#resister_new_RUNTEQ_student'
       
       post '/auth', to: 'authentications#create'
