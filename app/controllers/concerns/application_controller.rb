@@ -17,8 +17,8 @@ class ApplicationController < ActionController::API
         user = User.find_by(uid: result[:uid])
         if user.present? 
           @_current_user = user
-        elsif params[:isNewUser]
-          Rails.logger.info "isNewUser parameter: #{params[:isNewUser]}"
+        else
+          Rails.logger.info "Creating new user as the user was not found in the database."
           creation_result = User.create_new_user(params, result[:uid])
           if creation_result[:status] == 'success'
             @_current_user = creation_result[:user]
@@ -26,8 +26,6 @@ class ApplicationController < ActionController::API
           else
             render json: { status: 'ERROR', message: creation_result[:message] }
           end
-        else
-          render json: { status: 'ERROR', message: 'isNewUser is false or undefined'}
         end
       end
     end
