@@ -17,12 +17,13 @@ class ApplicationController < ActionController::API
         user = User.find_by(uid: result[:uid])
         if user.present? 
           @_current_user = user
+          render json: { status: 'success', message: 'User logged in successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: false }
         else
           Rails.logger.info "Creating new user as the user was not found in the database."
           creation_result = User.create_new_user(params, result[:uid])
           if creation_result[:status] == 'success'
             @_current_user = creation_result[:user]
-            render json: { status: 'success', message: 'User created successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student }
+            render json: { status: 'success', message: 'User created successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: true }
           else
             render json: { status: 'ERROR', message: creation_result[:message] }
           end
