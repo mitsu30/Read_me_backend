@@ -22,8 +22,12 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def index
-    users = User.includes(:user_groups, :membered_groups, :user_communities)
-                .where(user_communities: { community_id: 1 })
+    # users = User.includes(:user_groups, :membered_groups, :user_communities)
+    #             .where(user_communities: { community_id: 1 })
+    users = User.joins(:user_groups, :membered_groups, :user_communities)
+    .where(user_communities: { community_id: 1 },
+           membered_groups: { community_id: 1 })
+    .includes(:user_groups, :user_communities, :membered_groups)
 
     if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
       users = users.where(user_groups: { group_id: params[:group_id] })
@@ -74,7 +78,7 @@ class Api::V1::UsersController < ApplicationController
       name: user.name,
       greeting: user.greeting,
       avatar: user.avatar.attached? ? url_for(user.avatar) : nil,
-      group: user.membered_groups.find_by(community_id: 1).name
+      group: user.membered_groups.first.name
     }
   end
   # def order_params
