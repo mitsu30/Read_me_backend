@@ -1,12 +1,11 @@
 class Api::V1::UsersController < ApplicationController
   def resister_new_RUNTEQ_student
     user = current_user
-
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       
       community = Community.find(1)
-      user.take_part_in(community)
+      user.take_part_in(community) unless user.membered_communities.include?(community)
 
       group = Group.find(params[:group_id])
       user.join(group)
@@ -18,6 +17,7 @@ class Api::V1::UsersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
   rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error e.record.errors.full_messages.join(", ")
     render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
   end
 
@@ -41,10 +41,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
-    user = User.find_by(uid: params[:uid])
+    user = current_user
     if user
       user_data = user.attributes
-      byebug
       user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else

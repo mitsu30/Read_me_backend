@@ -7,9 +7,10 @@ class User < ApplicationRecord
   has_many :membered_groups, through: :user_groups, source: :group  # ユーザーが所属しているグループ
   
   validates :name, presence: true, length: { maximum: 255 }
-  validates :uid, presence: true, uniqueness: true
+  validates :uid, presence: true, uniqueness: true, length: { maximum: 255 }
   validates :role, presence: true
   validates :is_student, inclusion: { in: [true, false] }
+  validates :greeting, length: { maximum: 255 }
 
   enum role: { general: 0, admin: 1 }
 
@@ -31,7 +32,12 @@ class User < ApplicationRecord
   end
 
   def join(group)
-    membered_groups << group
+  # もしユーザーが同じコミュニティのグループにすでに所属していたら、そのグループから抜ける
+  existing_group = self.user_groups.joins(:group).where(groups: {community_id: group.community_id})
+  existing_group.each(&:destroy) if existing_group
+
+  # 新たなグループに所属
+  self.user_groups.create(group: group)
   end
   
   private
