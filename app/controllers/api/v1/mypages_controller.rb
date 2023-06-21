@@ -30,6 +30,7 @@ class Api::V1::MypagesController < ApplicationController
 
   def update
     user = current_user
+    byebug
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       
@@ -39,7 +40,7 @@ class Api::V1::MypagesController < ApplicationController
       group = Group.find(params[:group_id])
       user.join(group)
 
-      user.avatar.attach(params[:avatar]) if params[:avatar].present?
+      # user.avatar.attach(params[:avatar]) if params[:avatar].present?
     end
 
     render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
