@@ -1,25 +1,25 @@
 class Api::V1::UsersController < ApplicationController
-  def resister_new_RUNTEQ_student
-    user = current_user
-    ActiveRecord::Base.transaction do
-      user.update!(user_params)
+  # def resister_new_RUNTEQ_student
+  #   user = current_user
+  #   ActiveRecord::Base.transaction do
+  #     user.update!(user_params)
       
-      # community = Community.find(1)
-      # user.take_part_in(community) unless user.membered_communities.include?(community)
+  #     # community = Community.find(1)
+  #     # user.take_part_in(community) unless user.membered_communities.include?(community)
 
-      group = Group.find(params[:group_id])
-      user.join(group)
+  #     group = Group.find(params[:group_id])
+  #     user.join(group)
 
-      user.avatar.attach(params[:avatar]) if params[:avatar].present?
-    end
+  #     user.avatar.attach(params[:avatar]) if params[:avatar].present?
+  #   end
 
-    render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
-  rescue ActiveRecord::RecordNotFound
-    render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
-  rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error e.record.errors.full_messages.join(", ")
-    render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
-  end
+  #   render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
+  # rescue ActiveRecord::RecordNotFound
+  #   render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
+  # rescue ActiveRecord::RecordInvalid => e
+  #   Rails.logger.error e.record.errors.full_messages.join(", ")
+  #   render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
+  # end
 
   def index
     # users = User.includes(:user_groups, :membered_groups, :user_communities)
@@ -44,16 +44,17 @@ class Api::V1::UsersController < ApplicationController
     render json: users.map { |user| user_to_json(user) }
   end
 
-  def show
-    user = current_user
-    if user
-      user_data = user.attributes
-      user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
-      render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
-    else
-      render json: { status: 'ERROR', message: 'User not found' }
-    end
-  end
+  # def show
+  #   user = current_user
+  #   if user
+  #     user_data = user.attributes
+  #     user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
+  #     render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
+  #   else
+  #     render json: { status: 'ERROR', message: 'User not found' }
+  #   end
+  # end
+
 
   private
 
