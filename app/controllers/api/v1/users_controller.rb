@@ -4,8 +4,8 @@ class Api::V1::UsersController < ApplicationController
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       
-      community = Community.find(1)
-      user.take_part_in(community) unless user.membered_communities.include?(community)
+      # community = Community.find(1)
+      # user.take_part_in(community) unless user.membered_communities.include?(community)
 
       group = Group.find(params[:group_id])
       user.join(group)
@@ -25,9 +25,9 @@ class Api::V1::UsersController < ApplicationController
     # users = User.includes(:user_groups, :membered_groups, :user_communities)
     #             .where(user_communities: { community_id: 1 })
     users = User.joins(:user_groups, :membered_groups, :user_communities)
-    .where(user_communities: { community_id: 1 },
-           membered_groups: { community_id: 1 })
-    .includes(:user_groups, :user_communities, :membered_groups)
+                .where(user_communities: { community_id: 1 },
+                       membered_groups: { community_id: 1 })
+                .includes(:user_groups, :user_communities, :membered_groups)
 
     if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
       users = users.where(user_groups: { group_id: params[:group_id] })

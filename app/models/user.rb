@@ -20,6 +20,12 @@ class User < ApplicationRecord
     is_member = runteq_member?(params[:username])
     begin
       user = User.create!(uid: uid, name: params[:username], is_student: is_member)
+
+      if is_member
+        community = Community.find(1)
+        user.take_part_in(community) unless user.membered_communities.include?(community)
+      end
+      
       return { status: 'success', message: 'User created successfully.', user: user }
     rescue => e
       Rails.logger.error "User creation failed: #{e.message}"
