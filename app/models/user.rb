@@ -25,7 +25,7 @@ class User < ApplicationRecord
         community = Community.find(1)
         user.take_part_in(community) unless user.membered_communities.include?(community)
       end
-      
+
       return { status: 'success', message: 'User created successfully.', user: user }
     rescue => e
       Rails.logger.error "User creation failed: #{e.message}"
@@ -38,14 +38,17 @@ class User < ApplicationRecord
   end
 
   def join(group)
-  # もしユーザーが同じコミュニティのグループにすでに所属していたら、そのグループから抜ける
-  existing_group = self.user_groups.joins(:group).where(groups: {community_id: group.community_id})
-  existing_group.each(&:destroy) if existing_group
-
-  # 新たなグループに所属
-  self.user_groups.create(group: group)
-  end
+    # もしユーザーがすでにこのgroupに所属している場合は、何もしない
+    return if self.membered_groups.include?(group)
   
+    # もしユーザーが同じコミュニティのグループにすでに所属していたら、そのグループから抜ける
+    existing_group = self.user_groups.joins(:group).where(groups: {community_id: group.community_id})
+    existing_group.each(&:destroy) if existing_group
+  
+    # 新たなグループに所属
+    self.user_groups.create(group: group)
+  end
+
   private
 
   def self.runteq_member?(github_user_id)
