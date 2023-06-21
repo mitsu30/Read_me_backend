@@ -22,6 +22,7 @@ class Api::V1::MypagesController < ApplicationController
     if user
       user_data = user.attributes
       user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
+      user_data[:groups] = user.membered_groups.find_by(community_id: 1)
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }
