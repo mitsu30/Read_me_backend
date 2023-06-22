@@ -91,15 +91,17 @@ ActiveRecord::Schema.define(version: 2023_06_22_003802) do
   end
 
   create_table "profiles", force: :cascade do |t|
-    t.string "image_url", null: false
+    t.integer "privacy", default: 0, null: false
     t.bigint "user_id", null: false
+    t.bigint "template_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["template_id"], name: "index_profiles_on_template_id"
     t.index ["user_id"], name: "index_profiles_on_user_id"
   end
 
   create_table "questions", force: :cascade do |t|
-    t.integer "item", null: false
+    t.string "item", null: false
     t.bigint "template_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -151,6 +153,7 @@ ActiveRecord::Schema.define(version: 2023_06_22_003802) do
   add_foreign_key "groups", "communities"
   add_foreign_key "open_ranges", "communities"
   add_foreign_key "open_ranges", "profiles"
+  add_foreign_key "profiles", "templates"
   add_foreign_key "profiles", "users"
   add_foreign_key "questions", "templates"
   add_foreign_key "user_communities", "communities"

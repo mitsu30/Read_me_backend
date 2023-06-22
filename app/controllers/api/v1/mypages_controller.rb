@@ -31,7 +31,6 @@ class Api::V1::MypagesController < ApplicationController
 
   def update
     user = current_user
-    byebug
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       

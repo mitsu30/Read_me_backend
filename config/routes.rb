@@ -10,6 +10,7 @@ Rails.application.routes.draw do
 
       resource :mypages, only: [:show, :edit, :update]
       resources :templates, only: [:index, :show]
+      resource :profiles, only: [:create, :show]
       
       post '/auth', to: 'authentications#create'
       get '/groups/for_community/:community_id', to: 'groups#for_community'
