@@ -8,7 +8,7 @@ Rails.application.routes.draw do
       resources :users, only: [:index, :show]
       post '/users/resister_new_RUNTEQ_student', to: 'users#resister_new_RUNTEQ_student'
 
-      resources :mypages, only: [:show, :edit, :update]
+      resource :mypages, only: [:show, :edit, :update]
       resources :templates, only: [:index, :show]
       
       post '/auth', to: 'authentications#create'
