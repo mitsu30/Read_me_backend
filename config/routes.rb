@@ -8,7 +8,8 @@ Rails.application.routes.draw do
       resources :users, only: [:index, :show]
       post '/users/resister_new_RUNTEQ_student', to: 'users#resister_new_RUNTEQ_student'
 
-      resource :mypages, only: [:show, :edit, :update]
+      resources :mypages, only: [:show, :edit, :update]
+      resources :templates, only: [:index, :show]
       
       post '/auth', to: 'authentications#create'
       get '/groups/for_community/:community_id', to: 'groups#for_community'
