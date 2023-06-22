@@ -109,6 +109,8 @@ ActiveRecord::Schema.define(version: 2023_06_22_003802) do
   create_table "templates", force: :cascade do |t|
     t.string "name", null: false
     t.string "image_path", null: false
+    t.string "next_path", null: false
+    t.boolean "only_student", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
