@@ -1,71 +1,77 @@
 class Api::V1::ProfilesController < ApplicationController
   require 'mini_magick'
   require 'base64' 
-  
+
+  TEMPLATE_ID = ENV['TEMPLATE1_ID']
+  QUESTION_ID_1 = ENV['QUESTION_ID_1']
+  QUESTION_ID_2 = ENV['QUESTION_ID_2']
+  QUESTION_ID_3 = ENV['QUESTION_ID_3']
+  TEMPLATE_IMAGE_PATH = ENV['TEMPLATE1_IMAGE_PATH']
+  FONT_PATH = ENV['FONT_PATH']
+  TEMP_IMAGE_PATH = ENV['TEMP_IMAGE_PATH']
 
   def preview
-    user = current_user
+    begin
+      user, profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
 
-    profile = current_user.profiles.build(template_id: 1)
-
-    answers = params[:answers]
-    answer_1 = profile.answers.build(question_id: 1, body: params[:answers][:body1])
-    answer_2 = profile.answers.build(question_id: 2, body: params[:answers][:body2])
-    answer_3 = profile.answers.build(question_id: 3, body: params[:answers][:body3])
-    
-    composite_image = generate_image(answers)
-
-    temp_image_path = Rails.root.join('tmp', 'composite_image.png')
-    composite_image.write(temp_image_path)
-
-    encoded_image = Base64.encode64(File.open(temp_image_path).read)
-    File.delete(temp_image_path)
-
-    render json: { url: "data:image/jpg;base64,#{encoded_image}" } 
-  end
-
-
-  def create
-    user = current_user
-    ActiveRecord::Base.transaction do
-      profile = current_user.profiles.build(template_id: 1)
-      
-      answers = params[:answers]
-      answer_1 = profile.answers.build(question_id: 1, body: params[:answers][:body1])
-      answer_2 = profile.answers.build(question_id: 2, body: params[:answers][:body2])
-      answer_3 = profile.answers.build(question_id: 3, body: params[:answers][:body3])
-      
-      composite_image = generate_image(answers)
-
-      temp_image_path = Rails.root.join('tmp', 'composite_image.png')
-      composite_image.write(temp_image_path)
-
-      profile.save!
-      profile.image.attach(io: File.open(temp_image_path), filename: 'composite_image.png')
-
+      encoded_image = Base64.encode64(File.open(temp_image_path).read)
       File.delete(temp_image_path)
 
-      answer_1.save!
-      answer_2.save!
-      answer_3.save!
+      render json: { url: "data:image/jpg;base64,#{encoded_image}" } 
+    rescue => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
+  end
+
+  def create
+    begin
+      ActiveRecord::Base.transaction do
+        user, profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
+        
+        profile.save!
+        profile.image.attach(io: File.open(temp_image_path), filename: 'composite_image.png')
+
+        File.delete(temp_image_path)
+
+        answer_1.save!
+        answer_2.save!
+        answer_3.save!
+      end
+    rescue => e
+      render json: { error: e.message }, status: :unprocessable_entity
     end
   end
   
   private
+  
+  def build_profile_and_answers_and_image_path
+    user = current_user
+    profile = current_user.profiles.build(template_id: TEMPLATE_ID)
+    
+    answers = answers_params
+    answer_1 = profile.answers.build(question_id: QUESTION_ID_1, body: answers[:body1])
+    answer_2 = profile.answers.build(question_id: QUESTION_ID_2, body: answers[:body2])
+    answer_3 = profile.answers.build(question_id: QUESTION_ID_3, body: answers[:body3])
+    
+    composite_image = generate_image(answers)
 
-  def image_text_params
-    params.require(:answer).permit(:body)
+    temp_image_path = Rails.root.join(TEMP_IMAGE_PATH)
+    composite_image.write(temp_image_path)
+
+    [user, profile, answer_1, answer_2, answer_3, temp_image_path]
+  end
+
+  def answers_params
+    params.require(:answers).permit(:body1, :body2, :body3)
   end
 
   def generate_image(answers)
-    # MiniMagickを使って画像を読み込む。
-    composite_image = MiniMagick::Image.open(Rails.root.join('public', 'images', 'template1.png'))
-
-    # 画像にテキストを追加する。
+    composite_image = MiniMagick::Image.open(Rails.root.join(TEMPLATE_IMAGE_PATH))
+    
     composite_image.combine_options do |c|
       c.gravity 'North'
       c.pointsize '40'
-      c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf') 
+      c.font Rails.root.join(FONT_PATH)
       c.fill '#666666'
       c.annotate '-268+207', answers[:body1]
       c.annotate '+271+207', answers[:body2]
@@ -84,7 +90,7 @@ class Api::V1::ProfilesController < ApplicationController
         composite_image.combine_options do |c|
           c.gravity 'North'
           c.pointsize '40'
-          c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf')
+          c.font Rails.root.join(FONT_PATH)
           c.fill '#666666'
           c.draw "text #{text_position} '#{line}'"
         end
