@@ -6,8 +6,8 @@ class Profile < ApplicationRecord
 
   has_one_attached :image
 
+  validates :uuid, presence: true, length: { maximum: 255 }
   validates :privacy, presence: true
 
   enum privacy: { opened: 0, closed: 1, customed: 2}
-   
 end
