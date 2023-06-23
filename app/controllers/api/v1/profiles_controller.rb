@@ -26,11 +26,11 @@ class Api::V1::ProfilesController < ApplicationController
   def create
     begin
       ActiveRecord::Base.transaction do
-        user, profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
+        user, @profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
         
-        profile.uuid = SecureRandom.uuid
-        profile.save!
-        profile.image.attach(io: File.open(temp_image_path), filename: 'composite_image.png')
+        @profile.uuid = SecureRandom.uuid
+        @profile.save!
+        @profile.image.attach(io: File.open(temp_image_path), filename: 'composite_image.png')
 
         File.delete(temp_image_path)
 
@@ -38,10 +38,19 @@ class Api::V1::ProfilesController < ApplicationController
         answer_2.save!
         answer_3.save!
       end
-
-      render json: { status: 'success', message: 'Image created successfully.', url: profile.image.url, uuid: profile.uuid }
+      render json: { status: 'success', message: 'Image created successfully.', url: @profile.image.url, uuid: @profile.uuid }
     rescue => e
       render json: { error: e.message }, status: :unprocessable_entity
+    end
+  end
+
+  def show
+    user = current_user
+    profile = user.profiles.find_by(uuid: params[:id])
+    if profile
+      render json: { image_url: profile.image.url }
+    else
+      render json: { error: "Image not found" }, status: :not_found
     end
   end
   
@@ -49,7 +58,7 @@ class Api::V1::ProfilesController < ApplicationController
   
   def build_profile_and_answers_and_image_path
     user = current_user
-    profile = current_user.profiles.build(template_id: TEMPLATE_ID)
+    profile = user.profiles.build(template_id: TEMPLATE_ID)
     
     answers = answers_params
     answer_1 = profile.answers.build(question_id: QUESTION_ID_1, body: answers[:body1])

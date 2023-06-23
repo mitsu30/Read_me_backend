@@ -57,8 +57,7 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   def show
-    image_text = 
-    ImageText.find(params[:id])
+    image_text = ImageText.find(params[:id])
     if image_text
       render json: { image_url: image_text.image_url, id: image_text.id  }
     else

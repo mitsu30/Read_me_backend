@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
       resources :templates, only: [:index, :show]
 
-      resource :profiles, only: [:create, :show]
+      resources :profiles, only: [:create, :show]
       post '/profiles/preview', to: 'profiles#preview'
       
       post '/auth', to: 'authentications#create'
