@@ -10,6 +10,8 @@ class Api::V1::MypagesController < ApplicationController
       
       # Include the names of groups the user belongs to
       user_data[:groups] = user.membered_groups.map { |g| { id: g.id, name: g.name } }
+
+      user_data[:profiles] = user.profiles.map { |p| { id: p.id, image_url: p.image.url } }
       
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
