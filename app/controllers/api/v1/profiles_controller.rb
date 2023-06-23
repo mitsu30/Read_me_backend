@@ -3,20 +3,26 @@ class Api::V1::ProfilesController < ApplicationController
   require 'base64' 
   
 
-  # def preview
-  #   profire = Profile.new()
-  #   answer1 = Answer.new( (profire_id: profile)
-  #     answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
-  #   image = generate_image(image_text)
+  def preview
+    user = current_user
 
-  #   temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
-  #   image.write(temp_image_path)
+    profile = current_user.profiles.build(template_id: 1)
 
-  #   encoded_image = Base64.encode64(File.open(temp_image_path).read)
-  #   File.delete(temp_image_path)
+    answers = params[:answers]
+    answer_1 = profile.answers.build(question_id: 1, body: params[:answers][:body1])
+    answer_2 = profile.answers.build(question_id: 2, body: params[:answers][:body2])
+    answer_3 = profile.answers.build(question_id: 3, body: params[:answers][:body3])
+    
+    composite_image = generate_image(answers)
 
-  #   render json: { url: "data:image/jpg;base64,#{encoded_image}" } 
-  # end
+    temp_image_path = Rails.root.join('tmp', 'composite_image.png')
+    composite_image.write(temp_image_path)
+
+    encoded_image = Base64.encode64(File.open(temp_image_path).read)
+    File.delete(temp_image_path)
+
+    render json: { url: "data:image/jpg;base64,#{encoded_image}" } 
+  end
 
 
   def create

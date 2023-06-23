@@ -9,8 +9,11 @@ Rails.application.routes.draw do
       post '/users/resister_new_RUNTEQ_student', to: 'users#resister_new_RUNTEQ_student'
 
       resource :mypages, only: [:show, :edit, :update]
+
       resources :templates, only: [:index, :show]
+
       resource :profiles, only: [:create, :show]
+      post '/profiles/preview', to: 'profiles#preview'
       
       post '/auth', to: 'authentications#create'
       get '/groups/for_community/:community_id', to: 'groups#for_community'
