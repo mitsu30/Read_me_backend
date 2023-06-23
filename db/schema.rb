@@ -91,6 +91,7 @@ ActiveRecord::Schema.define(version: 2023_06_22_003802) do
   end
 
   create_table "profiles", force: :cascade do |t|
+    t.string "uuid", null: false
     t.integer "privacy", default: 0, null: false
     t.bigint "user_id", null: false
     t.bigint "template_id", null: false
