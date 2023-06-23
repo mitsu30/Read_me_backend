@@ -20,6 +20,7 @@ class User < ApplicationRecord
 
   def self.create_new_user(params, uid)
     is_member = runteq_member?(params[:username])
+    user = nil
     begin
       ActiveRecord::Base.transaction do
         user = User.create!(uid: uid, name: params[:username], is_student: is_member)
