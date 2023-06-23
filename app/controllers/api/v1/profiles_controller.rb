@@ -39,7 +39,7 @@ class Api::V1::ProfilesController < ApplicationController
         answer_3.save!
       end
 
-      render json: { status: 'success', message: 'Image created successfully.', url: profile.image.url, id: image_text.id }
+      render json: { status: 'success', message: 'Image created successfully.', url: profile.image.url, uuid: profile.uuid }
     rescue => e
       render json: { error: e.message }, status: :unprocessable_entity
     end
