@@ -21,13 +21,15 @@ class User < ApplicationRecord
   def self.create_new_user(params, uid)
     is_member = runteq_member?(params[:username])
     begin
-      user = User.create!(uid: uid, name: params[:username], is_student: is_member)
-
-      if is_member
-        community = Community.find(1)
-        user.take_part_in(community) unless user.membered_communities.include?(community)
+      ActiveRecord::Base.transaction do
+        user = User.create!(uid: uid, name: params[:username], is_student: is_member)
+  
+        if is_member
+          community = Community.find(1)
+          user.take_part_in(community) unless user.membered_communities.include?(community)
+        end
       end
-
+  
       return { status: 'success', message: 'User created successfully.', user: user }
     rescue => e
       Rails.logger.error "User creation failed: #{e.message}"

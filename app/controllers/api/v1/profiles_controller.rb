@@ -28,6 +28,7 @@ class Api::V1::ProfilesController < ApplicationController
       ActiveRecord::Base.transaction do
         user, profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
         
+        profile.uuid = SecureRandom.uuid
         profile.save!
         profile.image.attach(io: File.open(temp_image_path), filename: 'composite_image.png')
 
