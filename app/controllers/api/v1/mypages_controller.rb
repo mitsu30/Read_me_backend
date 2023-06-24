@@ -11,7 +11,7 @@ class Api::V1::MypagesController < ApplicationController
       # Include the names of groups the user belongs to
       user_data[:groups] = user.membered_groups.map { |g| { id: g.id, name: g.name } }
 
-      user_data[:profiles] = user.profiles.map { |p| { id: p.id, image_url: p.image.url } }
+      user_data[:profiles] = user.profiles.map { |p| { id: p.id, uuid: p.uuid, image_url: p.image.url } }
       
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
@@ -51,6 +51,16 @@ class Api::V1::MypagesController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error e.record.errors.full_messages.join(", ")
     render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
+  end
+
+  def profile
+    user = current_user
+    profile = user.profiles.find_by(uuid: params[:id])
+    if profile
+      render json: { image_url: profile.image.url }
+    else
+      render json: { error: "Image not found" }, status: :not_found
+    end
   end
 
   private
