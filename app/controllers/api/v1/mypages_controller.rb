@@ -6,12 +6,15 @@ class Api::V1::MypagesController < ApplicationController
       user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
       
       # Include the names of communities the user belongs to
-      user_data[:communities] = user.membered_communities.map { |c| { id: c.id, name: c.name } }
+      user_communities = user.membered_communities.map { |c| { id: c.id, name: c.name } }
+      user_data[:communities] = user_communities
       
       # Include the names of groups the user belongs to
-      user_data[:groups] = user.membered_groups.map { |g| { id: g.id, name: g.name } }
-
-      user_data[:profiles] = user.profiles.map { |p| { id: p.id, uuid: p.uuid, image_url: p.image.url } }
+      user_groups = user.membered_groups.map { |g| { id: g.id, name: g.name } }
+      user_data[:groups] = user_groups
+      
+      user_profiles = user.profiles.with_attached_image.map { |p| { id: p.id, uuid: p.uuid, image_url: p.image.url } }
+      user_data[:profiles] = user_profiles
       
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
