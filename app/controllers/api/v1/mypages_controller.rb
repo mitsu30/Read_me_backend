@@ -53,16 +53,6 @@ class Api::V1::MypagesController < ApplicationController
     render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
   end
 
-  def profile
-    user = current_user
-    profile = user.profiles.find_by(uuid: params[:id])
-    if profile
-      render json: { image_url: profile.image.url }
-    else
-      render json: { error: "Image not found" }, status: :not_found
-    end
-  end
-
   private
   
   def user_params
