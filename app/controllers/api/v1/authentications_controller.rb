@@ -1,6 +1,6 @@
 class Api::V1::AuthenticationsController < ApplicationController
   def create
-    render json: { message: "User successfully logged in!" } if current_user
+    render json: {  status: 'success', message: "User successfully logged in!" } if current_user
   end
 end
 
