@@ -53,6 +53,17 @@ class Api::V1::ProfilesController < ApplicationController
       render json: { error: "Image not found" }, status: :not_found
     end
   end
+
+  def destroy
+    begin
+      user = current_user
+      profile = user.profiles.find_by(uuid: params[:id])
+      profile.destroy!
+      render json: { status: 'success', message: 'Profile destroyed successfully.'}
+    rescue => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
+  end
   
   private
   
