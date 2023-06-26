@@ -25,14 +25,8 @@ class Api::V1::MypagesController < ApplicationController
     user = current_user
     ActiveRecord::Base.transaction do
       user.update!(user_params)
-      
-      # community = Community.find(1)
-      # user.take_part_in(community) unless user.membered_communities.include?(community)
-
       group = Group.find(params[:group_id])
       user.join(group)
-
-      # user.avatar.attach(params[:avatar]) if params[:avatar].present?
     end
 
     render json: { status: 'SUCCESS', message: 'Updated the user', data: user }

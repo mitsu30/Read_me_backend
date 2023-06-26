@@ -8,16 +8,18 @@ class ApplicationController < ActionController::API
   before_action :authenticate_token
 
   def authenticate_token
-    authenticate_with_http_token do |token, _options|
+    token, _options = ActionController::HttpAuthentication::Token.token_and_options(request)
+    
+    if token
       result = verify_id_token(token)
       Rails.logger.info "Authentication result: #{result}"
+      
       if result[:errors]
         render_400(nil, result[:errors])
       else
         user = User.find_by(uid: result[:uid])
-        if user.present? 
+        if user.present?
           @_current_user = user
-          # render json: { status: 'success', message: 'User logged in successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: false }
         else
           Rails.logger.info "Creating new user as the user was not found in the database."
           creation_result = User.create_new_user(params, result[:uid])
@@ -29,6 +31,9 @@ class ApplicationController < ActionController::API
           end
         end
       end
+    else
+      # トークンが見つからなかった場合のエラーメッセージを返す
+      render json: { status: 'ERROR', message: 'No token provided' }, status: :unauthorized
     end
   end
   

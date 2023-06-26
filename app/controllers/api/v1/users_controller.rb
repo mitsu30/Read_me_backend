@@ -1,26 +1,6 @@
 class Api::V1::UsersController < ApplicationController
-  # def resister_new_RUNTEQ_student
-  #   user = current_user
-  #   ActiveRecord::Base.transaction do
-  #     user.update!(user_params)
-      
-  #     # community = Community.find(1)
-  #     # user.take_part_in(community) unless user.membered_communities.include?(community)
-
-  #     group = Group.find(params[:group_id])
-  #     user.join(group)
-
-  #     user.avatar.attach(params[:avatar]) if params[:avatar].present?
-  #   end
-
-  #   render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
-  # rescue ActiveRecord::RecordNotFound
-  #   render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
-  # rescue ActiveRecord::RecordInvalid => e
-  #   Rails.logger.error e.record.errors.full_messages.join(", ")
-  #   render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
-  # end
-
+  skip_before_action :authenticate_token
+  
   def index
     # users = User.includes(:user_groups, :membered_groups, :user_communities)
     #             .where(user_communities: { community_id: 1 })
@@ -42,6 +22,10 @@ class Api::V1::UsersController < ApplicationController
                  .per(10)
   
     render json: users.map { |user| user_to_json(user) }
+  end
+
+  def show
+
   end
 
   # def show
