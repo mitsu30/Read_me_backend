@@ -3,13 +3,20 @@ class Api::V1::OpenRangesController < ApplicationController
   before_action :set_communities, only: :update, if: :membered_communities_only?
 
   def update
-    @profile.update!(privacy: profile_params[:privacy])
-    if membered_communities_only?
-      @communities.each do |community|
-        unless @profile.open_ranges.exists?(community: community)
-          @profile.open_ranges.create!(community: community)
+    begin
+      ActiveRecord::Base.transaction do
+        @profile.update!(privacy: profile_params[:privacy])
+        if membered_communities_only?
+          @communities.each do |community|
+            unless @profile.open_ranges.exists?(community: community)
+              @profile.open_ranges.create!(community: community)
+            end
+          end
         end
       end
+      render json: { status: 'SUCCESS', message: 'Loaded the user'}
+    rescue => e
+      render json: { error: e.message }, status: :unprocessable_entity
     end
   end
 
