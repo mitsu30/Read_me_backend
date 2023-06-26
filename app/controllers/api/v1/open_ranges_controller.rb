@@ -5,7 +5,6 @@ class Api::V1::OpenRangesController < ApplicationController
   def update
     begin
       ActiveRecord::Base.transaction do
-        @profile.update!(privacy: profile_params[:privacy])
         if membered_communities_only?
           @communities.each do |community|
             unless @profile.open_ranges.exists?(community: community)
@@ -13,6 +12,7 @@ class Api::V1::OpenRangesController < ApplicationController
             end
           end
         end
+        @profile.update!(privacy: profile_params[:privacy])
       end
       render json: { status: 'SUCCESS', message: 'Loaded the user'}
     rescue => e
