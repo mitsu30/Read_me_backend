@@ -6,7 +6,7 @@ class User < ApplicationRecord
   has_many :user_groups, dependent: :destroy
   has_many :membered_groups, through: :user_groups, source: :group  # ユーザーが所属しているグループ
   
-  has_many :profiles
+  has_many :profiles, dependent: :destroy
   
   validates :name, presence: true, length: { maximum: 255 }
   validates :uid, presence: true, uniqueness: true, length: { maximum: 255 }

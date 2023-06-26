@@ -9,5 +9,5 @@ class Profile < ApplicationRecord
   validates :uuid, presence: true, length: { maximum: 255 }
   validates :privacy, presence: true
 
-  enum privacy: { opened: 0, closed: 1, customed: 2}
+  enum privacy: { opened: 0, closed: 1, membered_communities_only: 2}
 end
