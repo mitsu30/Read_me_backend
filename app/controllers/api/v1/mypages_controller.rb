@@ -13,7 +13,7 @@ class Api::V1::MypagesController < ApplicationController
       user_groups = user.membered_groups.map { |g| { id: g.id, name: g.name } }
       user_data[:groups] = user_groups
       
-      user_profiles = user.profiles.with_attached_image.map { |p| { id: p.id, uuid: p.uuid, image_url: p.image.url } }
+      user_profiles = user.profiles.with_attached_image.map { |p| { id: p.id, uuid: p.uuid, image_url: p.image.url, privacy: p.privacy } }
       user_data[:profiles] = user_profiles
       
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
