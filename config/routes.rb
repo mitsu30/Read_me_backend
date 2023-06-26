@@ -10,7 +10,7 @@ Rails.application.routes.draw do
       resources :templates, only: [:index, :show]
       resources :profiles, only: [:create, :show, :destroy]
       post '/profiles/preview', to: 'profiles#preview'
-      resources :open_ranges, only: [:update]
+      resources :open_ranges, only: [:show, :update]
       resources :communities, only: [:show]
       post '/auth', to: 'authentications#create'
       get '/groups/for_community/:community_id', to: 'groups#for_community'

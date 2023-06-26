@@ -48,7 +48,7 @@ class Api::V1::ProfilesController < ApplicationController
     user = current_user
     profile = user.profiles.find_by(uuid: params[:id])
     if profile
-      render json: { image_url: profile.image.url }
+      render json: { image_url: profile.image.url, privacy: profile.privacy }
     else
       render json: { error: "Image not found" }, status: :not_found
     end

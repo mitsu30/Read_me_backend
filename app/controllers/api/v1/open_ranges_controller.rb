@@ -1,5 +1,5 @@
 class Api::V1::OpenRangesController < ApplicationController
-  before_action :set_user, :set_profile, only: :update
+  before_action :set_user, :set_profile, only: %i[show update]
   before_action :set_communities, only: :update, if: :membered_communities_only?
 
   def update
@@ -18,6 +18,11 @@ class Api::V1::OpenRangesController < ApplicationController
     rescue => e
       render json: { error: e.message }, status: :unprocessable_entity
     end
+  end
+
+  def show
+    open_ranges = @profile.open_ranges.map { |o| {community_id: o.community_id, }}
+    render json: { open_ranges: open_ranges}
   end
 
   private
