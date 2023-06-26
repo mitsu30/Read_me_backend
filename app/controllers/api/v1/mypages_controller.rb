@@ -1,21 +1,10 @@
-class Api::V1::MypagesController < ApplicationController  
+class Api::V1::MypagesController < ApplicationController
+  before_action :set_current_user, only: [:show, :edit]
+
   def show
-    user = current_user
-    if user
-      user_data = user.attributes
-      user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
-      
-      # Include the names of communities the user belongs to
-      user_communities = user.membered_communities.map { |c| { id: c.id, name: c.name } }
-      user_data[:communities] = user_communities
-      
-      # Include the names of groups the user belongs to
-      user_groups = user.membered_groups.map { |g| { id: g.id, name: g.name } }
-      user_data[:groups] = user_groups
-      
-      user_profiles = user.profiles.with_attached_image.map { |p| { id: p.id, uuid: p.uuid, image_url: p.image.url, privacy: p.privacy } }
-      user_data[:profiles] = user_profiles
-      
+    if @user
+      user_data = build_user_data
+      user_data[:profiles] = build_profiles_data
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }
@@ -23,11 +12,9 @@ class Api::V1::MypagesController < ApplicationController
   end
 
   def edit
-    user = current_user
-    if user
-      user_data = user.attributes
-      user_data[:avatar_url] = rails_blob_url(user.avatar) if user.avatar.attached?
-      user_data[:groups] = user.membered_groups.find_by(community_id: 1)
+    if @user
+      user_data = build_user_data
+      user_data[:groups] = @user.membered_groups.find_by(community_id: 1)
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }
@@ -57,6 +44,30 @@ class Api::V1::MypagesController < ApplicationController
   end
 
   private
+
+  def set_current_user
+    @user = current_user
+  end
+
+  def build_user_data
+    user_data = @user.attributes
+    user_data[:avatar_url] = rails_blob_url(@user.avatar) if @user.avatar.attached?
+    user_data[:communities] = @user.membered_communities.map { |c| { id: c.id, name: c.name } }
+    user_data[:groups] = @user.membered_groups.map { |g| { id: g.id, name: g.name } }
+    user_data
+  end
+
+  def build_profiles_data
+    @user.profiles.with_attached_image.map do |p| 
+      {
+        id: p.id,
+        uuid: p.uuid,
+        image_url: p.image.url,
+        privacy: p.privacy,
+        open_range_communities: p.open_ranges.map { |open_range| open_range.community.name } 
+      }
+    end
+  end
   
   def user_params
     params.require(:user).permit(:name, :uid, :role, :is_student, :avatar, :greeting)
