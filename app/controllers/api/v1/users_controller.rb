@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authenticate_token
-  
+  skip_before_action :authenticate_token, only: [:index, :show_general]
+
   def index
     # users = User.includes(:user_groups, :membered_groups, :user_communities)
     #             .where(user_communities: { community_id: 1 })
@@ -25,6 +25,10 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
+
+  end
+
+  def show_general
 
   end
 

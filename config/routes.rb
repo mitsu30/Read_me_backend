@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       post '/image_texts/preview', to: 'image_texts#preview'
       get '/wakeup', to: 'image_texts#wakeup'
       resources :users, only: [:index, :show]
-      post '/users/resister_new_RUNTEQ_student', to: 'users#resister_new_RUNTEQ_student'
+      get '/users/show_general/:id', to: 'users#show_general'
       resource :mypages, only: [:show, :edit, :update] 
       resources :templates, only: [:index, :show]
       resources :profiles, only: [:create, :show, :destroy]
