@@ -11,6 +11,11 @@ Rails.application.routes.draw do
       resources :profiles, only: [:create, :show, :destroy]
       post '/profiles/preview', to: 'profiles#preview'
       namespace :profiles do
+        resources :second, only: [:create] do
+          collection do
+            post :preview
+          end
+        end
         resources :third, only: [:create] do
           collection do
             post :preview
