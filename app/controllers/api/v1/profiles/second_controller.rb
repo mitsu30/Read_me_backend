@@ -140,14 +140,13 @@ class Api::V1::Profiles::SecondController < ApplicationController
       c.pointsize '30'
       c.font Rails.root.join(FONT_PATH)
       c.fill '#666666'
-      c.annotate '-268+156', answers[:body1]
-      c.annotate '-174+216', answers[:body2]
-      c.annotate '-100+280', answers[:body3]
-      c.annotate '-156+414', answers[:body4]
-      c.annotate '-278+494', answers[:body5]
-      c.annotate '-278+494', answers[:body6]
-      c.annotate '-278+494', answers[:body7]
-      c.annotate '+105+156', user.membered_groups.find_by(community_id: 1)&.name
+      c.annotate '-260+162', answers[:body1]
+      c.annotate '-464+230', answers[:body2]
+      c.annotate '-338+230', answers[:body3]
+      c.annotate '-45+230' , answers[:body4]
+      c.annotate '-219+300', answers[:body5]
+      c.annotate '+5+365', answers[:body6]
+      c.annotate '-272+484', answers[:body7]
     end
     
     File.delete(avatar_path)
