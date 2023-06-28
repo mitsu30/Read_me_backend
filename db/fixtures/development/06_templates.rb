@@ -11,7 +11,7 @@ Template.seed do |s|
   s.name = 'べーしっく'
   s.image_path = '/templates/2.png'
   s.next_path = '/profiles/2'
-  s.only_student = true
+  s.only_student = false
 end
 
 Template.seed do |s|
