@@ -27,7 +27,7 @@ class Api::V1::Profiles::ThirdController < ApplicationController
   def create
     begin
       ActiveRecord::Base.transaction do
-        user, @profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
+        user, @profile, answer_1, answer_2, answer_3, answer_4, answer_5, temp_image_path = build_profile_and_answers_and_image_path
         
         @profile.uuid = SecureRandom.uuid
         @profile.save!
@@ -38,6 +38,8 @@ class Api::V1::Profiles::ThirdController < ApplicationController
         answer_1.save!
         answer_2.save!
         answer_3.save!
+        answer_4.save!
+        answer_5.save!
       end
       render json: { status: 'success', message: 'Image created successfully.', url: @profile.image.url, uuid: @profile.uuid }
     rescue => e
@@ -98,8 +100,7 @@ class Api::V1::Profiles::ThirdController < ApplicationController
     File.open(avatar_path, 'wb') do |file|
       file.write(user.avatar.download)
     end
-  
-    # Crop the avatar image to a square and resize it to 200x200
+
     cropped_filename = SecureRandom.hex
     cropped_and_resized_avatar_path = Rails.root.join('tmp', "#{cropped_filename}.png")
     avatar_image = MiniMagick::Image.open(avatar_path)
@@ -111,7 +112,6 @@ class Api::V1::Profiles::ThirdController < ApplicationController
     end
     avatar_image.write(cropped_and_resized_avatar_path)
     
-    # Now generate circular avatar
     output_filename = SecureRandom.hex
     output_path = Rails.root.join('tmp', "#{output_filename}.png")
     user_image = MiniMagick::Image.open(cropped_and_resized_avatar_path)
@@ -124,10 +124,9 @@ class Api::V1::Profiles::ThirdController < ApplicationController
       img << output_path
     end
   
-    # Here, replace the original avatar_image with the circular avatar in the composite image
     composite_image = composite_image.composite(MiniMagick::Image.open(output_path)) do |c|
-      c.compose 'Over'    # OverCompositeOp
-      c.geometry '+890+115' # place at (10, 10)
+      c.compose 'Over'    
+      c.geometry '+890+115' 
     end
     
     composite_image.combine_options do |c|
@@ -143,7 +142,6 @@ class Api::V1::Profiles::ThirdController < ApplicationController
       c.annotate '+105+156', user.membered_groups.find_by(community_id: 1)&.name
     end
     
-    # Delete the temporary files
     File.delete(avatar_path)
     File.delete(cropped_and_resized_avatar_path)
     File.delete(output_path)
