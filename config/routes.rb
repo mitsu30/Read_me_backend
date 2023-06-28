@@ -5,10 +5,18 @@ Rails.application.routes.draw do
       post '/image_texts/preview', to: 'image_texts#preview'
       get '/wakeup', to: 'image_texts#wakeup'
       resources :users, only: [:index, :show]
-      get '/users/show_general/:id', to: 'users#show_general'
+      get '/users/show_public/:id', to: 'users#show_general'
       resource :mypages, only: [:show, :edit, :update] 
       resources :templates, only: [:index, :show]
       resources :profiles, only: [:create, :show, :destroy]
+      post '/profiles/preview', to: 'profiles#preview'
+      namespace :profiles do
+        resources :third, only: [:create] do
+          collection do
+            post :preview
+          end
+        end
+      end
       post '/profiles/preview', to: 'profiles#preview'
       resources :open_ranges, only: [:show, :update]
       resources :communities, only: [:show]

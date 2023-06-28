@@ -15,7 +15,7 @@ class ApplicationController < ActionController::API
       Rails.logger.info "Authentication result: #{result}"
       
       if result[:errors]
-        render_400(nil, result[:errors])
+        render status: :bad_request, json: { errors: result[:errors] }
       else
         user = User.find_by(uid: result[:uid])
         if user.present?
@@ -25,15 +25,15 @@ class ApplicationController < ActionController::API
           creation_result = User.create_new_user(params, result[:uid])
           if creation_result[:status] == 'success'
             @_current_user = creation_result[:user]
-            render json: { status: 'success', message: 'User created successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: true }
+            render status: :created, json: { status: 'success', message: 'User created successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: true }
           else
-            render json: { status: 'ERROR', message: creation_result[:message] }
+            render status: :unprocessable_entity, json: { status: 'ERROR', message: creation_result[:message] }
           end
         end
       end
     else
       # トークンが見つからなかった場合のエラーメッセージを返す
-      render json: { status: 'ERROR', message: 'No token provided' }, status: :unauthorized
+      render status: :unauthorized, json: { status: 'ERROR', message: 'No token provided' }
     end
   end
   
