@@ -92,22 +92,41 @@ class Api::V1::Profiles::ThirdController < ApplicationController
 
   def generate_image(answers, user)
     composite_image = MiniMagick::Image.open(Rails.root.join(TEMPLATE_IMAGE_PATH))
-
+  
     # Generate temporary avatar file
     avatar_path = Rails.root.join('tmp', 'avatar.png')
     File.open(avatar_path, 'wb') do |file|
       file.write(user.avatar.download)
     end
-    
-    # Open the temporary avatar file with MiniMagick
+  
+    # Crop the avatar image to a square and resize it to 200x200
+    cropped_and_resized_avatar_path = Rails.root.join('tmp', 'cropped_and_resized_avatar.png')
     avatar_image = MiniMagick::Image.open(avatar_path)
-    
-    # Composite avatar onto the main image
-    composite_image = composite_image.composite(avatar_image) do |c|
-      c.compose 'Over'    # OverCompositeOp
-      c.geometry '+950+200' # place at (10, 10)
+    avatar_image.combine_options do |c|
+      c.gravity "Center"
+      shortest_side = [avatar_image.width, avatar_image.height].min
+      c.crop "#{shortest_side}x#{shortest_side}+0+0"
+      c.resize "200x200"
     end
-
+    avatar_image.write(cropped_and_resized_avatar_path)
+  
+    # Now generate circular avatar
+    output_path = Rails.root.join('tmp', 'output.png')
+    user_image = MiniMagick::Image.open(cropped_and_resized_avatar_path)
+    MiniMagick::Tool::Convert.new do |img|
+      img.size "200x200"
+      img << 'xc:transparent'
+      img.fill cropped_and_resized_avatar_path
+      img.draw "translate 100, 100 circle 0,0 100,0"
+      img.trim
+      img << output_path
+    end
+    
+    # Here, replace the original avatar_image with the circular avatar in the composite image
+    composite_image = composite_image.composite(MiniMagick::Image.open(output_path)) do |c|
+      c.compose 'Over'    # OverCompositeOp
+      c.geometry '+890+115' # place at (10, 10)
+    end
     
     composite_image.combine_options do |c|
       c.gravity 'North'
