@@ -92,15 +92,16 @@ class Api::V1::Profiles::ThirdController < ApplicationController
 
   def generate_image(answers, user)
     composite_image = MiniMagick::Image.open(Rails.root.join(TEMPLATE_IMAGE_PATH))
-  
-    # Generate temporary avatar file
-    avatar_path = Rails.root.join('tmp', 'avatar.png')
+    
+    avatar_filename = SecureRandom.hex
+    avatar_path = Rails.root.join('tmp', "#{avatar_filename}.png")
     File.open(avatar_path, 'wb') do |file|
       file.write(user.avatar.download)
     end
   
     # Crop the avatar image to a square and resize it to 200x200
-    cropped_and_resized_avatar_path = Rails.root.join('tmp', 'cropped_and_resized_avatar.png')
+    cropped_filename = SecureRandom.hex
+    cropped_and_resized_avatar_path = Rails.root.join('tmp', "#{cropped_filename}.png")
     avatar_image = MiniMagick::Image.open(avatar_path)
     avatar_image.combine_options do |c|
       c.gravity "Center"
@@ -109,9 +110,10 @@ class Api::V1::Profiles::ThirdController < ApplicationController
       c.resize "200x200"
     end
     avatar_image.write(cropped_and_resized_avatar_path)
-  
+    
     # Now generate circular avatar
-    output_path = Rails.root.join('tmp', 'output.png')
+    output_filename = SecureRandom.hex
+    output_path = Rails.root.join('tmp', "#{output_filename}.png")
     user_image = MiniMagick::Image.open(cropped_and_resized_avatar_path)
     MiniMagick::Tool::Convert.new do |img|
       img.size "200x200"
@@ -121,7 +123,7 @@ class Api::V1::Profiles::ThirdController < ApplicationController
       img.trim
       img << output_path
     end
-    
+  
     # Here, replace the original avatar_image with the circular avatar in the composite image
     composite_image = composite_image.composite(MiniMagick::Image.open(output_path)) do |c|
       c.compose 'Over'    # OverCompositeOp
@@ -140,6 +142,11 @@ class Api::V1::Profiles::ThirdController < ApplicationController
       c.annotate '-278+494', answers[:body5]
       c.annotate '+105+156', user.membered_groups.find_by(community_id: 1)&.name
     end
+    
+    # Delete the temporary files
+    File.delete(avatar_path)
+    File.delete(cropped_and_resized_avatar_path)
+    File.delete(output_path)
     
     composite_image
   end
