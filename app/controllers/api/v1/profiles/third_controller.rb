@@ -92,6 +92,22 @@ class Api::V1::Profiles::ThirdController < ApplicationController
 
   def generate_image(answers, user)
     composite_image = MiniMagick::Image.open(Rails.root.join(TEMPLATE_IMAGE_PATH))
+
+    # Generate temporary avatar file
+    avatar_path = Rails.root.join('tmp', 'avatar.png')
+    File.open(avatar_path, 'wb') do |file|
+      file.write(user.avatar.download)
+    end
+    
+    # Open the temporary avatar file with MiniMagick
+    avatar_image = MiniMagick::Image.open(avatar_path)
+    
+    # Composite avatar onto the main image
+    composite_image = composite_image.composite(avatar_image) do |c|
+      c.compose 'Over'    # OverCompositeOp
+      c.geometry '+950+200' # place at (10, 10)
+    end
+
     
     composite_image.combine_options do |c|
       c.gravity 'North'
