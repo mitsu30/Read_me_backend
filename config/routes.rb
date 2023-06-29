@@ -15,7 +15,7 @@ Rails.application.routes.draw do
             post :preview
           end
         end
-        resources :second, only: [:create] do
+        resources :basic, only: [:create] do
           collection do
             post :preview
           end
