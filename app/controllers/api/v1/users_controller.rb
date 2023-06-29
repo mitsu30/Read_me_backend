@@ -25,11 +25,19 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
-
+    @user = current_user
+    @showed_user = User.find(params[:id])
+    if @showed_user
+      showed_user_data = build_user_data
+      showed_user_data[:profiles] = build_profiles_data
+      render json: { status: 'SUCCESS', message: 'Loaded the user', data: showed_user_data }
+    else
+      render json: { status: 'ERROR', message: 'User not found' }
+    end
   end
 
   def show_public
-    @user = User.find(id: params[:id])
+    @user = User.find(params[:id])
     if @user
       user_data = build_user_data
       user_data[:profiles] = build_profiles_data
@@ -66,32 +74,28 @@ class Api::V1::UsersController < ApplicationController
     }
   end
   
-  def build_user_data_for_public
-    user_data = @user.attributes
-    user_data[:avatar_url] = rails_blob_url(@user.avatar) if @user.avatar.attached?
-    user_data[:communities] = @user.membered_communities.map { |c| { id: c.id, name: c.name } }
-    user_data[:groups] = @user.membered_groups.map { |g| { id: g.id, name: g.name } }
-    user_data
+  def build_user_data
+    showed_user_data = @showed_user.attributes
+    showed_user_data[:avatar_url] = rails_blob_url(@showed_user.avatar) if @showed_user.avatar.attached?
+    showed_user_data[:communities] = @showed_user.membered_communities.map { |c| { id: c.id, name: c.name } }
+    showed_user_data[:groups] = @showed_user.membered_groups.map { |g| { id: g.id, name: g.name } }
+    showed_user_data
   end
 
-  def build_profiles_data
-    @user.profiles.with_attached_image.map do |p| 
-      {
-        id: p.id,
-        uuid: p.uuid,
-        image_url: p.image.url,
-        privacy: p.privacy,
-        open_range_communities: p.open_ranges.map { |open_range| open_range.community.name } 
-      }
-    end
-  end
+  # def build_user_data
+  #   user_data = @user.attributes
+  #   user_data[:avatar_url] = rails_blob_url(@user.avatar) if @user.avatar.attached?
+  #   user_data[:communities] = @user.membered_communities.map { |c| { id: c.id, name: c.name } }
+  #   user_data[:groups] = @user.membered_groups.map { |g| { id: g.id, name: g.name } }
+  #   user_data
+  # end
 
   def build_profiles_data
-    current_user_communities = current_user.membered_communities.map(&:id) 
+    user_communities = @user.membered_communities.map(&:id) 
     
-    @user.profiles.with_attached_image.select do |profile|
+    @showed_user.profiles.with_attached_image.select do |profile|
       # profileが全体公開か、特定のコミュニティ公開でcurrent_userがそのコミュニティに所属している場合のみtrueを返す
-      profile.privacy == '全体' || (profile.privacy == '特定のコミュニティ' && (current_user_communities & profile.open_ranges.map(&:community_id)).any?)
+      profile.privacy == '全体' || (profile.privacy == '特定のコミュニティ' && (user_communities & profile.open_ranges.map(&:community_id)).any?)
     end.map do |p| 
       {
         id: p.id,
@@ -102,6 +106,5 @@ class Api::V1::UsersController < ApplicationController
       }
     end
   end
-  
 end
 
