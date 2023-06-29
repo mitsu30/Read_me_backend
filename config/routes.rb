@@ -20,13 +20,12 @@ Rails.application.routes.draw do
             post :preview
           end
         end
-        resources :third, only: [:create] do
+        resources :school, only: [:create] do
           collection do
             post :preview
           end
         end
       end
-      post '/profiles/preview', to: 'profiles#preview'
       resources :open_ranges, only: [:show, :update]
       resources :communities, only: [:show]
       post '/auth', to: 'authentications#create'

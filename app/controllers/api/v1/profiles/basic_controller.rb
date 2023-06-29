@@ -1,4 +1,5 @@
 class Api::V1::Profiles::BasicController < Api::V1::Profiles::BaseController
+  
   TEMPLATE_ID = ENV['TEMPLATE2_ID']
   QUESTION_ID_1 = ENV['TEMPLATE2_QUESTION_ID_1']
   QUESTION_ID_2 = ENV['TEMPLATE2_QUESTION_ID_2']

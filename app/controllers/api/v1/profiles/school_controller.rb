@@ -1,6 +1,4 @@
-class Api::V1::Profiles::ThirdController < ApplicationController
-  require 'mini_magick'
-  require 'base64' 
+class Api::V1::Profiles::SchoolController < Api::V1::Profiles::BaseController
 
   TEMPLATE_ID = ENV['TEMPLATE3_ID']
   QUESTION_ID_1 = ENV['TEMPLATE3_QUESTION_ID_1']
@@ -9,8 +7,6 @@ class Api::V1::Profiles::ThirdController < ApplicationController
   QUESTION_ID_4 = ENV['TEMPLATE3_QUESTION_ID_4']
   QUESTION_ID_5 = ENV['TEMPLATE3_QUESTION_ID_5']
   TEMPLATE_IMAGE_PATH = ENV['TEMPLATE3_IMAGE_PATH']
-  FONT_PATH = ENV['FONT_PATH']
-  TEMP_IMAGE_PATH = ENV['TEMP_IMAGE_PATH']
 
   def preview
     begin
@@ -47,27 +43,6 @@ class Api::V1::Profiles::ThirdController < ApplicationController
     end
   end
 
-  def show
-    user = current_user
-    profile = user.profiles.find_by(uuid: params[:id])
-    if profile
-      render json: { image_url: profile.image.url, privacy: profile.privacy }
-    else
-      render json: { error: "Image not found" }, status: :not_found
-    end
-  end
-
-  def destroy
-    begin
-      user = current_user
-      profile = user.profiles.find_by(uuid: params[:id])
-      profile.destroy!
-      render json: { status: 'success', message: 'Profile destroyed successfully.'}
-    rescue => e
-      render json: { error: e.message }, status: :unprocessable_entity
-    end
-  end
-  
   private
   
   def build_profile_and_answers_and_image_path
