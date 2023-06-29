@@ -8,9 +8,13 @@ Rails.application.routes.draw do
       get '/users/show_public/:id', to: 'users#show_general'
       resource :mypages, only: [:show, :edit, :update] 
       resources :templates, only: [:index, :show]
-      resources :profiles, only: [:create, :show, :destroy]
-      post '/profiles/preview', to: 'profiles#preview'
+      resources :profiles, only: [:show, :destroy]
       namespace :profiles do
+        resources :minimum, only: [:create] do
+          collection do
+            post :preview
+          end
+        end
         resources :second, only: [:create] do
           collection do
             post :preview
