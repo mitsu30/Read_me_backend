@@ -142,9 +142,9 @@ class Api::V1::Profiles::SecondController < ApplicationController
       c.fill '#666666'
       c.annotate '-260+162', answers[:body1]
       c.annotate '-464+230', answers[:body2]
-      c.annotate '-338+230', answers[:body3]
+      c.annotate '-340+230', answers[:body3]
       c.annotate '-45+230' , answers[:body4]
-      c.annotate '-219+300', answers[:body5]
+      c.annotate '-219+302', answers[:body5]
       c.annotate '+5+365', answers[:body6]
       c.annotate '-272+484', answers[:body7]
     end
