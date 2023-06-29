@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authenticate_token, only: [:index, :show_general]
+  skip_before_action :authenticate_token, only: [:index, :show_public]
 
   def index
     # users = User.includes(:user_groups, :membered_groups, :user_communities)
@@ -92,10 +92,9 @@ class Api::V1::UsersController < ApplicationController
 
   def build_profiles_data
     user_communities = @user.membered_communities.map(&:id) 
-    
     @showed_user.profiles.with_attached_image.select do |profile|
       # profileが全体公開か、特定のコミュニティ公開でcurrent_userがそのコミュニティに所属している場合のみtrueを返す
-      profile.privacy == '全体' || (profile.privacy == '特定のコミュニティ' && (user_communities & profile.open_ranges.map(&:community_id)).any?)
+      profile.privacy == 'opened' || (profile.privacy == 'membered_communities_only' && (user_communities & profile.open_ranges.map(&:community_id)).any?)
     end.map do |p| 
       {
         id: p.id,
