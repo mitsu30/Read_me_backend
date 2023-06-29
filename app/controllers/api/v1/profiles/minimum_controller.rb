@@ -8,7 +8,7 @@ class Api::V1::Profiles::MinimumController < Api::V1::Profiles::BaseController
 
   def preview
     begin
-      user, profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
+      @user, profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
 
       encoded_image = Base64.encode64(File.open(temp_image_path).read)
       File.delete(temp_image_path)
@@ -22,7 +22,7 @@ class Api::V1::Profiles::MinimumController < Api::V1::Profiles::BaseController
   def create
     begin
       ActiveRecord::Base.transaction do
-        user, @profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
+        @user, @profile, answer_1, answer_2, answer_3, temp_image_path = build_profile_and_answers_and_image_path
         
         @profile.uuid = SecureRandom.uuid
         @profile.save!
@@ -43,8 +43,7 @@ class Api::V1::Profiles::MinimumController < Api::V1::Profiles::BaseController
   private
   
   def build_profile_and_answers_and_image_path
-    user = current_user
-    profile = user.profiles.build(template_id: TEMPLATE_ID)
+    profile = @user.profiles.build(template_id: TEMPLATE_ID)
     
     answers = answers_params
     answer_1 = profile.answers.build(question_id: QUESTION_ID_1, body: answers[:body1])
@@ -56,7 +55,7 @@ class Api::V1::Profiles::MinimumController < Api::V1::Profiles::BaseController
     temp_image_path = Rails.root.join(TEMP_IMAGE_PATH)
     composite_image.write(temp_image_path)
 
-    [user, profile, answer_1, answer_2, answer_3, temp_image_path]
+    [@user, profile, answer_1, answer_2, answer_3, temp_image_path]
   end
 
   def answers_params
