@@ -37,22 +37,18 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show_public
-    @user = User.find(params[:id])
-    if @user
-      user_data = build_user_data
-      user_data[:profiles] = build_profiles_data
-      render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
+    @showed_user = User.find(params[:id])
+    if @showed_user
+      showed_user_data = build_user_data
+      showed_user_data[:profiles] = build_profiles_data_public
+      render json: { status: 'SUCCESS', message: 'Loaded the user', data: showed_user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }
     end
   end
 
   private
-
-  def user_params
-    params.require(:user).permit(:name, :uid, :role, :is_student, :avatar, :greeting)
-  end
-
+  
   def order_params
     case params[:sort_by]
     when "name_asc"
@@ -82,14 +78,6 @@ class Api::V1::UsersController < ApplicationController
     showed_user_data
   end
 
-  # def build_user_data
-  #   user_data = @user.attributes
-  #   user_data[:avatar_url] = rails_blob_url(@user.avatar) if @user.avatar.attached?
-  #   user_data[:communities] = @user.membered_communities.map { |c| { id: c.id, name: c.name } }
-  #   user_data[:groups] = @user.membered_groups.map { |g| { id: g.id, name: g.name } }
-  #   user_data
-  # end
-
   def build_profiles_data
     user_communities = @user.membered_communities.map(&:id) 
     @showed_user.profiles.with_attached_image.select do |profile|
@@ -100,8 +88,18 @@ class Api::V1::UsersController < ApplicationController
         id: p.id,
         uuid: p.uuid,
         image_url: p.image.url,
-        privacy: p.privacy,
-        open_range_communities: p.open_ranges.map { |open_range| open_range.community.name }
+      }
+    end
+  end
+
+  def build_profiles_data_public
+    @showed_user.profiles.with_attached_image.select do |profile|
+      profile.privacy == 'opened' 
+    end.map do |p| 
+      {
+        id: p.id,
+        uuid: p.uuid,
+        image_url: p.image.url,
       }
     end
   end

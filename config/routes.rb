@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       post '/image_texts/preview', to: 'image_texts#preview'
       get '/wakeup', to: 'image_texts#wakeup'
       resources :users, only: [:index, :show]
-      get '/users/show_public/:id', to: 'users#show_general'
+      get '/users/show_public/:id', to: 'users#show_public'
       resource :mypages, only: [:show, :edit, :update] 
       resources :templates, only: [:index, :show]
       namespace :profiles do
