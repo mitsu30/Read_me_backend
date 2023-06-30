@@ -1,10 +1,19 @@
 class Api::V1::MypagesController < ApplicationController
-  before_action :set_current_user, only: [:show, :edit]
+  before_action :set_current_user, only: [:show, :edit, :avatar]
 
   def show
     if @user
       user_data = build_user_data
       user_data[:profiles] = build_profiles_data
+      render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
+    else
+      render json: { status: 'ERROR', message: 'User not found' }
+    end
+  end
+  
+  def avatar
+    if @user
+      user_data = rails_blob_url(@user.avatar) if @user.avatar.attached?
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }

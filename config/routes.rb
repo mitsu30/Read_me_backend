@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       resources :users, only: [:index, :show]
       get '/users/show_public/:id', to: 'users#show_public'
       resource :mypages, only: [:show, :edit, :update] 
+      get '/mypages/avatar', to: 'mypages#avatar'
       resources :templates, only: [:index, :show]
       namespace :profiles do
         resources :base, only: [:show, :destroy] do
