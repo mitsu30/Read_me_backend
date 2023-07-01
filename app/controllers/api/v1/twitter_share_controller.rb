@@ -1,4 +1,6 @@
 class Api::V1::TwitterShareController < ApplicationController
+  skip_before_action :authenticate_token
+  
   def show
     profile = Profile.find_by(uuid: params[:id])
     if profile
