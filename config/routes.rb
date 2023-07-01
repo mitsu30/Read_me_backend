@@ -32,6 +32,7 @@ Rails.application.routes.draw do
       resources :communities, only: [:show]
       post '/auth', to: 'authentications#create'
       get '/groups/for_community/:community_id', to: 'groups#for_community'
+      resources :twitter_share, only: [:show]
     end
   end
 end

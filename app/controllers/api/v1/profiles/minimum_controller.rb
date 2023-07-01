@@ -1,10 +1,18 @@
 class Api::V1::Profiles::MinimumController < Api::V1::Profiles::BaseController
   
-  TEMPLATE_ID = ENV['TEMPLATE1_ID']
-  QUESTION_ID_1 = ENV['QUESTION_ID_1']
-  QUESTION_ID_2 = ENV['QUESTION_ID_2']
-  QUESTION_ID_3 = ENV['QUESTION_ID_3']
-  TEMPLATE_IMAGE_PATH = ENV['TEMPLATE1_IMAGE_PATH']
+  # TEMPLATE_ID = ENV['TEMPLATE1_ID']
+  # QUESTION_ID_1 = ENV['QUESTION_ID_1']
+  # QUESTION_ID_2 = ENV['QUESTION_ID_2']
+  # QUESTION_ID_3 = ENV['QUESTION_ID_3']
+  # TEMPLATE_IMAGE_PATH = ENV['TEMPLATE1_IMAGE_PATH']
+  TEMPLATE_ID = '1'
+  QUESTION_ID_1 = '1'
+  QUESTION_ID_2 = '2'
+  QUESTION_ID_3 = '3'
+  TEMPLATE_IMAGE_PATH = 'public/images/template1.png'
+  FONT_PATH='public/fonts/Yomogi.ttf'
+  TEMP_IMAGE_PATH='tmp/composite_image.png'
+
 
   def preview
     begin

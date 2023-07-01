@@ -2,6 +2,8 @@ class Api::V1::ImageTextsController < ApplicationController
   require 'mini_magick'
   require 'base64' 
   
+  skip_before_action :authenticate_token
+  
   def wakeup
     render json: { message: 'Server is awake' }
   end

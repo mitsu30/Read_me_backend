@@ -1,6 +1,6 @@
 class Api::V1::TwitterShareController < ApplicationController
   def show
-    profile = user.profiles.find_by(uuid: params[:id])
+    profile = Profile.find_by(uuid: params[:id])
     if profile
       render json: { image_url: profile.image.url }
     else
