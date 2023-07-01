@@ -28,6 +28,7 @@ Rails.application.routes.draw do
           end
         end
       end
+      get '/profiles/base/show_public/:id', to: 'profiles/base#show_public'
       resources :open_ranges, only: [:show, :update]
       resources :communities, only: [:show]
       post '/auth', to: 'authentications#create'

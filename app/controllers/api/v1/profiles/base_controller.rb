@@ -3,6 +3,7 @@ class Api::V1::Profiles::BaseController < ApplicationController
   require 'base64' 
   
   before_action :set_current_user
+  skip_before_action :authenticate_token, :set_current_user,  only: [:show_public]
 
   FONT_PATH = ENV['FONT_PATH']
   TEMP_IMAGE_PATH = ENV['TEMP_IMAGE_PATH']
@@ -15,6 +16,16 @@ class Api::V1::Profiles::BaseController < ApplicationController
       render json: { error: "Image not found" }, status: :not_found
     end
   end
+
+  def show_public
+    profile = Profile.find_by(uuid: params[:id])
+    if profile
+      render json: { image_url: profile.image.url, privacy: profile.privacy }
+    else
+      render json: { error: "Image not found" }, status: :not_found
+    end
+  end
+
 
   def destroy
     begin
