@@ -24,6 +24,7 @@ class ApplicationController < ActionController::API
           creation_result = User.create_new_user(params, result[:uid])
           if creation_result[:status] == 'success'
             @_current_user = creation_result[:user]
+            @is_new_user = true
             render status: :created, json: { status: 'success', message: 'User created successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: true }
           else
             render status: :unprocessable_entity, json: { status: 'ERROR', message: creation_result[:message] }
