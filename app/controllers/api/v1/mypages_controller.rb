@@ -1,5 +1,5 @@
 class Api::V1::MypagesController < ApplicationController
-  before_action :set_current_user, only: [:show, :edit, :avatar]
+  before_action :set_current_user, only: [:show, :edit, :update, :avatar]
 
   def show
     if @user
@@ -13,7 +13,9 @@ class Api::V1::MypagesController < ApplicationController
   
   def avatar
     if @user
-      user_data = rails_blob_url(@user.avatar) if @user.avatar.attached?
+      user_data = {}
+      user_data[:avatar_url] = rails_blob_url(@user.avatar) if @user.avatar.attached?
+      user_data[:is_student] = @user.is_student
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }
@@ -23,7 +25,7 @@ class Api::V1::MypagesController < ApplicationController
   def edit
     if @user
       user_data = build_user_data
-      user_data[:groups] = @user.membered_groups.find_by(community_id: 1)
+      user_data[:groups] = @user.membered_groups.find_by(community_id: 1) if @user.is_student
       render json: { status: 'SUCCESS', message: 'Loaded the user', data: user_data }
     else
       render json: { status: 'ERROR', message: 'User not found' }
@@ -31,19 +33,19 @@ class Api::V1::MypagesController < ApplicationController
   end
 
   def update
-    user = current_user
+    @user
     ActiveRecord::Base.transaction do
-      user.update!(user_params)
-      group = Group.find(params[:group_id])
-      user.join(group)
+      @user.update!(user_params)
+      group = Group.find(params[:group_id]) if @user.is_student
+      @user.join(group) if @user.is_student
     end
 
-    render json: { status: 'SUCCESS', message: 'Updated the user', data: user }
-  rescue ActiveRecord::RecordNotFound
-    render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
-  rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error e.record.errors.full_messages.join(", ")
-    render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
+      render json: { status: 'SUCCESS', message: 'Updated the user', data: @user }
+    rescue ActiveRecord::RecordNotFound
+      render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error e.record.errors.full_messages.join(", ")
+      render json: { status: 'ERROR', message: 'Invalid data', data: e.record.errors }, status: :unprocessable_entity
   end
 
   private
