@@ -1,6 +1,8 @@
 class Api::V1::TemplatesController < ApplicationController
   def index
-    templates = Template.all
+    @user = current_user
+    templates = Template.all if @user.is_student
+    templates = Template.where(only_student: false) unless @user.is_student
     render json: templates.map { |template| template_to_json(template) }
   end
 
