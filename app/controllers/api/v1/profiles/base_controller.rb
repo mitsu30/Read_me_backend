@@ -23,7 +23,7 @@ class Api::V1::Profiles::BaseController < ApplicationController
 
     if profile
       if profile.privacy == 'opened' || (profile.privacy == 'membered_communities_only' && (user_communities & profile.open_ranges.map(&:community_id)).any?)
-        render json: { image_url: profile.image.url, privacy: profile.privacy }
+        render json: { image_url: profile.image.url, user_id: profile.user.id,  username: profile.user.name }
       else
         render json: { error: "Profile is not accessible" }, status: :forbidden
       end
@@ -39,7 +39,7 @@ class Api::V1::Profiles::BaseController < ApplicationController
         render json: { error: "Profile is not public" }, status: :forbidden
         return
       end
-      render json: { image_url: profile.image.url, privacy: profile.privacy }
+      render json: { image_url: profile.image.url, user_id: profile.user.id, username: profile.user.name }
     else
       render json: { error: "Image not found" }, status: :not_found
     end
