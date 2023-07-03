@@ -40,7 +40,7 @@ class Api::V1::MypagesController < ApplicationController
       @user.join(group) if @user.is_student
     end
 
-      render json: { status: 'SUCCESS', message: 'Updated the user', data: @user }
+      render json: { status: 'SUCCESS', message: 'Updated the user', data: @user.avatar.url }
     rescue ActiveRecord::RecordNotFound
       render json: { status: 'ERROR', message: 'Not found' }, status: :not_found
     rescue ActiveRecord::RecordInvalid => e
