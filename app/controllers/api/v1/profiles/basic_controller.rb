@@ -120,6 +120,32 @@ class Api::V1::Profiles::BasicController < Api::V1::Profiles::BaseController
       c.compose 'Over'    
       c.geometry '+890+115' 
     end
+
+    zodiac_to_image = {
+      'やぎ' => 'capricorn',
+      'みずがめ' => 'aquarius',
+      'うお' => 'pisces',
+      'おひつじ' => 'aries',
+      'おうし' => 'taurus',
+      'ふたご' => 'gemini',
+      'かに' => 'cancer',
+      'しし' => 'leo',
+      'おとめ' => 'virgo',
+      'てんびん' => 'libra',
+      'さそり' => 'scorpio',
+      'いて' => 'sagittarius'
+    }
+
+    zodiac_image_name = zodiac_to_image[answers[:body4]]
+    zodiac_image_path = "public/images/zodiac/#{zodiac_image_name}.png"
+    zodiac_image = MiniMagick::Image.open(zodiac_image_path)
+    zodiac_image.resize "80x80"
+
+    composite_image = composite_image.composite(zodiac_image) do |c|
+      c.gravity 'North'
+      c.compose 'Over'    
+      c.geometry '+32+200' 
+    end
     
     composite_image.combine_options do |c|
       c.gravity 'North'
@@ -129,7 +155,7 @@ class Api::V1::Profiles::BasicController < Api::V1::Profiles::BaseController
       c.annotate '-260+162', answers[:body1]
       c.annotate '-464+230', answers[:body2]
       c.annotate '-340+230', answers[:body3]
-      c.annotate '-45+230' , answers[:body4]
+      c.annotate '-55+230' , answers[:body4]
       c.annotate '-219+302', answers[:body5]
       c.annotate '+5+365', answers[:body6]
       c.annotate '-272+484', answers[:body7]
