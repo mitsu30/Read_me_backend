@@ -96,6 +96,8 @@ GEM
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
+    faraday-retry (2.2.0)
+      faraday (~> 2.0)
     ffi (1.15.5)
     globalid (1.1.0)
       activesupport (>= 5.0)
@@ -231,6 +233,7 @@ DEPENDENCIES
   byebug
   dockerfile-rails (>= 1.2)
   dotenv-rails
+  faraday-retry
   image_processing (~> 1.2)
   jwt
   kaminari

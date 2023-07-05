@@ -49,4 +49,5 @@ gem 'seed-fu'
 gem 'aws-sdk-s3'
 gem "octokit"
 gem 'kaminari'
+gem 'faraday-retry'
 gem "dockerfile-rails", ">= 1.2", :group => :development

@@ -119,22 +119,22 @@ module FirebaseAuth
           )
       # JWTの有効期限が切れた場合に発生
       rescue JWT::ExpiredSignature
-        errors << "Firebase ID token has expired. Get a fresh token from your app and try again."
+        return ["Firebase ID token has expired. Get a fresh token from your app and try again."]
       # iat（Issued At）クレームが無効な場合に発生
       rescue JWT::InvalidIatError
-        errors << "Invalid ID token. 'Issued-at time' (iat) must be in the past."
+        return ["Invalid ID token. 'Issued-at time' (iat) must be in the past."]
       # iss（Issuer）クレームが無効な場合に発生
       rescue JWT::InvalidIssuerError
-        errors << "Invalid ID token. 'Issuer' (iss) Must be 'https://securetoken.google.com/<firebase_project_id>'."
+        return ["Invalid ID token. 'Issuer' (iss) Must be 'https://securetoken.google.com/<firebase_project_id>'."]
       # aud（Audience）(トークンの受取人)クレームが無効な場合に発生
       rescue JWT::InvalidAudError
-        errors << "Invalid ID token. 'Audience' (aud) must be your Firebase project ID."
+        return ["Invalid ID token. 'Audience' (aud) must be your Firebase project ID."]
       # トークンの署名が無効な場合、つまりトークンが改ざんされた可能性がある場合に発生
       rescue JWT::VerificationError => e
-        errors << "Firebase ID token has invalid signature. #{e.message}"
+        return ["Firebase ID token has invalid signature. #{e.message}"]
       # トークンのデコードが何らかの理由で失敗した場合に発生
       rescue JWT::DecodeError => e
-        errors << "Invalid ID token. #{e.message}"
+        return ["Invalid ID token. #{e.message}"]
       end
   
       # subとalgはJWT.decodeで自動検証できないため、追加検証が必要

@@ -2,34 +2,38 @@ require 'octokit'
 
 class ApplicationController < ActionController::API
   include FirebaseAuth
-  # include Api::ExceptionHandler
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
   before_action :authenticate_token
 
   def authenticate_token
-    authenticate_with_http_token do |token, _options|
+    token, _options = ActionController::HttpAuthentication::Token.token_and_options(request)
+    
+    if token
       result = verify_id_token(token)
       Rails.logger.info "Authentication result: #{result}"
+      
       if result[:errors]
-        render_400(nil, result[:errors])
+        render status: :bad_request, json: { errors: result[:errors] }
       else
         user = User.find_by(uid: result[:uid])
-        if user.present? 
+        if user.present?
           @_current_user = user
-        elsif params[:isNewUser]
-          Rails.logger.info "isNewUser parameter: #{params[:isNewUser]}"
+        else
+          Rails.logger.info "Creating new user as the user was not found in the database."
           creation_result = User.create_new_user(params, result[:uid])
           if creation_result[:status] == 'success'
             @_current_user = creation_result[:user]
-            render json: { status: 'success', message: 'User created successfully.', id: @_current_user.id, username: @_current_user.name }
+            @is_new_user = true
+            render status: :created, json: { status: 'success', message: 'User created successfully.', uid: @_current_user.uid, username: @_current_user.name, is_student: @_current_user.is_student, isNewUser: true }
           else
-            render json: { status: 'ERROR', message: creation_result[:message] }
+            render status: :unprocessable_entity, json: { status: 'ERROR', message: creation_result[:message] }
           end
-        else
-          render json: { status: 'ERROR', message: 'isNewUser is false or undefined'}
         end
       end
+    else
+      # トークンが見つからなかった場合のエラーメッセージを返す
+      render status: :unauthorized, json: { status: 'ERROR', message: 'No token provided' }
     end
   end
   

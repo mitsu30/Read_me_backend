@@ -2,6 +2,8 @@ class Api::V1::ImageTextsController < ApplicationController
   require 'mini_magick'
   require 'base64' 
   
+  skip_before_action :authenticate_token
+  
   def wakeup
     render json: { message: 'Server is awake' }
   end
@@ -57,8 +59,7 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   def show
-    image_text = 
-    ImageText.find(params[:id])
+    image_text = ImageText.find(params[:id])
     if image_text
       render json: { image_url: image_text.image_url, id: image_text.id  }
     else
