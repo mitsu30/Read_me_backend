@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authenticate_token, only: [:index, :show_public]
+  skip_before_action :authenticate_token, only: [:show_public]
 
   def index
     users = User.joins(:user_groups, :membered_groups, :user_communities)
