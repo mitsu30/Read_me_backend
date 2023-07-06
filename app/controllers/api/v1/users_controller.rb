@@ -11,7 +11,7 @@ class Api::V1::UsersController < ApplicationController
     if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
       users = users.where(user_groups: { group_id: params[:group_id] })
     end
-    
+
     if params[:name].present?
       users = users.where('users.name LIKE ?', "%#{params[:name]}%")
     end
@@ -68,7 +68,7 @@ class Api::V1::UsersController < ApplicationController
   
   def build_user_data
     showed_user_data = @showed_user.attributes
-    showed_user_data[:avatar_url] = rails_blob_url(@showed_user.avatar) if @showed_user.avatar.attached?
+    showed_user_data[:avatar_url] = (@user.is_student && @showed_user.avatar.attached?) ? rails_blob_url(@showed_user.avatar) : nil
     showed_user_data[:communities] = @showed_user.membered_communities.map { |c| { id: c.id, name: c.name } }
     showed_user_data[:groups] = @showed_user.membered_groups.map { |g| { id: g.id, name: g.name } }
     showed_user_data
