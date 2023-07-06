@@ -89,9 +89,6 @@ class Api::V1::Profiles::BasicController < Api::V1::Profiles::BaseController
     
     avatar_filename = SecureRandom.hex
     avatar_path = Rails.root.join('tmp', "#{avatar_filename}.png")
-    # File.open(avatar_path, 'wb') do |file|
-    #   file.write(user.avatar.download)
-    # end
 
     if user.avatar.attached?
       File.open(avatar_path, 'wb') do |file|
