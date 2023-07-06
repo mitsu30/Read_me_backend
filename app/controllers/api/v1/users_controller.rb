@@ -2,6 +2,7 @@ class Api::V1::UsersController < ApplicationController
   skip_before_action :authenticate_token, only: [:show_public]
 
   def index
+    @user = current_user
     users = User.joins(:user_groups, :membered_groups, :user_communities)
                 .where(user_communities: { community_id: 1 },
                        membered_groups: { community_id: 1 })
@@ -10,7 +11,7 @@ class Api::V1::UsersController < ApplicationController
     if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
       users = users.where(user_groups: { group_id: params[:group_id] })
     end
-
+    
     if params[:name].present?
       users = users.where('users.name LIKE ?', "%#{params[:name]}%")
     end
@@ -59,10 +60,11 @@ class Api::V1::UsersController < ApplicationController
       id: user.id,
       name: user.name,
       greeting: user.greeting,
-      avatar: user.avatar.attached? ? url_for(user.avatar) : nil,
+      avatar: (@user.is_student && user.avatar.attached?) ? url_for(user.avatar) : nil,
       group: user.membered_groups.first.name
     }
   end
+  
   
   def build_user_data
     showed_user_data = @showed_user.attributes
