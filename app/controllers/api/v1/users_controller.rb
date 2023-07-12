@@ -1,10 +1,10 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authenticate_token, only: [:index, :show_public]
+  skip_before_action :authenticate_token, only: [:show_public]
 
   def index
-    users = User.joins(:user_groups, :membered_groups, :user_communities)
-                .where(user_communities: { community_id: 1 },
-                       membered_groups: { community_id: 1 })
+    @user = current_user
+    users = User.left_outer_joins(:user_groups, :membered_groups, :user_communities)
+                .where(user_communities: { community_id: 1 })
                 .includes(:user_groups, :user_communities, :membered_groups)
 
     if params[:group_id].present? && params[:group_id] != "RUNTEQ" 
@@ -59,14 +59,15 @@ class Api::V1::UsersController < ApplicationController
       id: user.id,
       name: user.name,
       greeting: user.greeting,
-      avatar: user.avatar.attached? ? url_for(user.avatar) : nil,
-      group: user.membered_groups.first.name
+      avatar: (@user.is_student && user.avatar.attached?) ? url_for(user.avatar) : nil,
+      group: user.membered_groups.first ? user.membered_groups.first.name : nil
     }
   end
   
+  
   def build_user_data
     showed_user_data = @showed_user.attributes
-    showed_user_data[:avatar_url] = rails_blob_url(@showed_user.avatar) if @showed_user.avatar.attached?
+    showed_user_data[:avatar_url] = (@user.is_student && @showed_user.avatar.attached?) ? rails_blob_url(@showed_user.avatar) : nil
     showed_user_data[:communities] = @showed_user.membered_communities.map { |c| { id: c.id, name: c.name } }
     showed_user_data[:groups] = @showed_user.membered_groups.map { |g| { id: g.id, name: g.name } }
     showed_user_data

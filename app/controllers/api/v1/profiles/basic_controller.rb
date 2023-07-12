@@ -89,8 +89,13 @@ class Api::V1::Profiles::BasicController < Api::V1::Profiles::BaseController
     
     avatar_filename = SecureRandom.hex
     avatar_path = Rails.root.join('tmp', "#{avatar_filename}.png")
-    File.open(avatar_path, 'wb') do |file|
-      file.write(user.avatar.download)
+
+    if user.avatar.attached?
+      File.open(avatar_path, 'wb') do |file|
+        file.write(user.avatar.download)
+      end
+    else
+      FileUtils.cp(Rails.root.join('public/images/default_avatar.png'), avatar_path)
     end
 
     cropped_filename = SecureRandom.hex
@@ -135,16 +140,18 @@ class Api::V1::Profiles::BasicController < Api::V1::Profiles::BaseController
       'さそり' => 'scorpio',
       'いて' => 'sagittarius'
     }
+    
+    if answers[:body4]
+      zodiac_image_name = zodiac_to_image[answers[:body4]]
+      zodiac_image_path = "public/images/zodiac/#{zodiac_image_name}.png"
+      zodiac_image = MiniMagick::Image.open(zodiac_image_path)
+      zodiac_image.resize "80x80"
 
-    zodiac_image_name = zodiac_to_image[answers[:body4]]
-    zodiac_image_path = "public/images/zodiac/#{zodiac_image_name}.png"
-    zodiac_image = MiniMagick::Image.open(zodiac_image_path)
-    zodiac_image.resize "80x80"
-
-    composite_image = composite_image.composite(zodiac_image) do |c|
-      c.gravity 'North'
-      c.compose 'Over'    
-      c.geometry '+32+200' 
+      composite_image = composite_image.composite(zodiac_image) do |c|
+        c.gravity 'North'
+        c.compose 'Over'    
+        c.geometry '+32+200' 
+      end
     end
     
     composite_image.combine_options do |c|

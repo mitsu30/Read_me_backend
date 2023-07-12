@@ -81,8 +81,16 @@ class Api::V1::Profiles::SchoolController < Api::V1::Profiles::BaseController
     
     avatar_filename = SecureRandom.hex
     avatar_path = Rails.root.join('tmp', "#{avatar_filename}.png")
-    File.open(avatar_path, 'wb') do |file|
-      file.write(user.avatar.download)
+    # File.open(avatar_path, 'wb') do |file|
+    #   file.write(user.avatar.download)
+    # end
+
+    if user.avatar.attached?
+      File.open(avatar_path, 'wb') do |file|
+        file.write(user.avatar.download)
+      end
+    else
+      FileUtils.cp(Rails.root.join('public/images/default_avatar.png'), avatar_path)
     end
 
     cropped_filename = SecureRandom.hex
