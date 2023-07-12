@@ -1,20 +1,20 @@
 class ImageText < ApplicationRecord
   has_one_attached :image
 
-  validates :answer1, length: { maximum: 26 }
-  validates :answer2, length: { maximum: 13 }
-  validate :validate_answer3
+  validates :nickname, length: { maximum: 26 }
+  validates :hobby, length: { maximum: 13 }
+  validate :validate_message
 
   private
 
-  def validate_answer3
-    return if answer3.blank?
+  def validate_message
+    return if message.blank?
 
-    lines = answer3.split("\n")
+    lines = message.split("\n")
     if lines.length > 3
-      errors.add(:answer3, '3行以内で入力してください。')
+      errors.add(:message, '3行以内で入力してください。')
     elsif lines.any? { |line| line.length > 26 }
-      errors.add(:answer3, '各行26文字以内で入力してください。')
+      errors.add(:message, '各行26文字以内で入力してください。')
     end
   end
 end
