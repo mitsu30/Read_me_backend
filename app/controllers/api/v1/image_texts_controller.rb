@@ -9,7 +9,7 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   def preview
-    image_text = ImageText.new(nickname: params[:image_text][:answer1], hobby: params[:image_text][:answer2], message: params[:image_text][:answer3])
+    image_text = ImageText.new(nickname: params[:image_text][:nickname], hobby: params[:image_text][:hobby], message: params[:image_text][:message])
     image = generate_image(image_text)
 
     temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
@@ -30,23 +30,11 @@ class Api::V1::ImageTextsController < ApplicationController
         # 画像生成
         image = generate_image(image_text)
   
-        # S3リソースの初期化
-        s3_client = Aws::S3::Client.new(region: ENV['AWS_REGION'])
-        s3_resource = Aws::S3::Resource.new(client: s3_client)
+        # S3に画像をアップロードし、URLを設定
+        uploader = ImageUploader.new(image)
+        image_text.image_url = uploader.upload
   
-        # S3のバケットを取得
-        bucket = s3_resource.bucket(ENV['AWS_BUCKET'])
-  
-        # ファイル名を生成（ここではUUIDを使用）
-        filename = SecureRandom.uuid + '.jpg'
-        
-        # S3に画像をアップロード
-        obj = bucket.put_object(key: filename, body: image.to_blob)
-        # S3の公開URLを生成
-        image_url = "https://#{ENV['AWS_BUCKET']}.s3.#{ENV['AWS_REGION']}.amazonaws.com/#{filename}"
-  
-        # URLを設定して保存
-        image_text.image_url = image_url
+        # 保存
         image_text.save!
       end
       render json: { status: 'success', message: 'Image created successfully.', url: image_text.image_url, id: image_text.id }
@@ -70,7 +58,7 @@ class Api::V1::ImageTextsController < ApplicationController
   private
 
   def image_text_params
-    params.require(:image_text).permit(:answer1, :answer2, :answer3)
+    params.require(:image_text).permit(:nickname, :hobby, :message)
   end
 
   def generate_image(image_text)
