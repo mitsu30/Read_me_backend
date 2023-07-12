@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_22_003802) do
+ActiveRecord::Schema.define(version: 2023_07_12_083551) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -73,9 +73,9 @@ ActiveRecord::Schema.define(version: 2023_06_22_003802) do
   end
 
   create_table "image_texts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "answer1"
-    t.string "answer2"
-    t.string "answer3"
+    t.string "nickname"
+    t.string "hobby"
+    t.string "message"
     t.string "image_url", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
