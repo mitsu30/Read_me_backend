@@ -9,7 +9,7 @@ class Api::V1::ImageTextsController < ApplicationController
   end
 
   def preview
-    image_text = ImageText.new(answer1: params[:image_text][:answer1], answer2: params[:image_text][:answer2], answer3: params[:image_text][:answer3])
+    image_text = ImageText.new(nickname: params[:image_text][:answer1], hobby: params[:image_text][:answer2], message: params[:image_text][:answer3])
     image = generate_image(image_text)
 
     temp_image_path = Rails.root.join('tmp', 'temp_image.jpg')
@@ -83,10 +83,10 @@ class Api::V1::ImageTextsController < ApplicationController
       c.pointsize '40'
       c.font Rails.root.join('public', 'fonts', 'Yomogi.ttf') 
       c.fill '#666666'
-      c.annotate '-268+207', image_text.answer1
-      c.annotate '+271+207', image_text.answer2
+      c.annotate '-268+207', image_text.nickname
+      c.annotate '+271+207', image_text.hobby
 
-      lines = image_text.answer3.split("\n")
+      lines = image_text.message.split("\n")
       lines.each_with_index do |line, index|
         text_position = case lines.size
         when 1
