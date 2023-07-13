@@ -5,13 +5,7 @@ class Api::V1::OpenRangesController < ApplicationController
   def update
     begin
       ActiveRecord::Base.transaction do
-        if membered_communities_only?
-          @communities.each do |community|
-            unless @profile.open_ranges.exists?(community: community)
-              @profile.open_ranges.create!(community: community)
-            end
-          end
-        end
+        create_open_ranges_for_communities if membered_communities_only?
         @profile.update!(privacy: profile_params[:privacy])
       end
       render json: { status: 'SUCCESS', message: 'Loaded the user'}
@@ -45,5 +39,13 @@ class Api::V1::OpenRangesController < ApplicationController
 
   def membered_communities_only?
     params.dig(:profile, :privacy) == 'membered_communities_only'
+  end
+
+  def create_open_ranges_for_communities
+    @communities.each do |community|
+      unless @profile.open_ranges.exists?(community: community)
+        @profile.open_ranges.create!(community: community)
+      end
+    end
   end
 end
