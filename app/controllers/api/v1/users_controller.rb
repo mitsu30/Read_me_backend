@@ -16,10 +16,16 @@ class Api::V1::UsersController < ApplicationController
     end
   
     users = users.order(order_params)
-                 .page(params[:page])
+                 .page(params[:page] || 1)
                  .per(10)
-  
-    render json: users.map { |user| user_to_json(user) }
+
+    pagination_info = {
+      current_page: users.current_page,
+      total_pages: users.total_pages,
+      per_page: users.limit_value,
+    }
+
+    render json: { users: users.map { |user| user_to_json(user) }, pagination: pagination_info }
   end
 
   def show
