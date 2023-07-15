@@ -7,6 +7,8 @@ class User < ApplicationRecord
   has_many :membered_groups, through: :user_groups, source: :group  # ユーザーが所属しているグループ
   
   has_many :profiles, dependent: :destroy
+
+  has_many :likes, dependent: :destroy
   
   validates :name, presence: true, length: { maximum: 255 }
   validates :uid, presence: true, uniqueness: true, length: { maximum: 255 }

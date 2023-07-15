@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_07_12_083551) do
+ActiveRecord::Schema.define(version: 2023_07_15_122411) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -79,6 +79,15 @@ ActiveRecord::Schema.define(version: 2023_07_12_083551) do
     t.string "image_url", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "likes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "profile_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["profile_id"], name: "index_likes_on_profile_id"
+    t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
   create_table "open_ranges", force: :cascade do |t|
@@ -152,6 +161,8 @@ ActiveRecord::Schema.define(version: 2023_07_12_083551) do
   add_foreign_key "answers", "questions"
   add_foreign_key "communities", "users", column: "owner_id"
   add_foreign_key "groups", "communities"
+  add_foreign_key "likes", "profiles"
+  add_foreign_key "likes", "users"
   add_foreign_key "open_ranges", "communities"
   add_foreign_key "open_ranges", "profiles"
   add_foreign_key "profiles", "templates"

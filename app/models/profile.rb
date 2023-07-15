@@ -3,6 +3,7 @@ class Profile < ApplicationRecord
   belongs_to :template
   has_many :open_ranges, dependent: :destroy
   has_many :answers, dependent: :destroy
+  has_many :likes, dependent: :destroy
 
   has_one_attached :image
 
