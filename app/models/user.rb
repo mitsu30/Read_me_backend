@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :profiles, dependent: :destroy
 
   has_many :likes, dependent: :destroy
+  has_many :like_profiles, dependent: :destroy through: :likes, source: :profile
   
   validates :name, presence: true, length: { maximum: 255 }
   validates :uid, presence: true, uniqueness: true, length: { maximum: 255 }
@@ -54,6 +55,14 @@ class User < ApplicationRecord
   
     # 新たなグループに所属
     self.user_groups.create(group: group)
+  end
+
+  def like(profile)
+    like_profiles << profile
+  end
+
+  def unlike(profile)
+    like_profiles.delete(profile)
   end
 
   private
