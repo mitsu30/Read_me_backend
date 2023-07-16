@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_many :profiles, dependent: :destroy
 
   has_many :likes, dependent: :destroy
-  has_many :like_profiles, dependent: :destroy through: :likes, source: :profile
+  has_many :like_profiles, through: :likes, source: :profile
   
   validates :name, presence: true, length: { maximum: 255 }
   validates :uid, presence: true, uniqueness: true, length: { maximum: 255 }
