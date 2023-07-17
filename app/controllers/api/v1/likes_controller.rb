@@ -11,6 +11,14 @@ class Api::V1::LikesController < ApplicationController
     end
   end
 
+  def check
+    user = current_user
+    profile = Profile.find_by(uuid: params[:profile_id])
+    liked = user.likes.exists?(profile: profile)
+
+    render json: { isLiked: liked }
+  end
+
   def destroy
     user = current_user
     profile = user.likes.find_by(uuid: params[:id]).profile
