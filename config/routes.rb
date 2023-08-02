@@ -27,6 +27,11 @@ Rails.application.routes.draw do
             post :preview
           end
         end
+        resources :anniversary, only: [:create] do
+          collection do
+            post :preview
+          end
+        end
       end
       get '/profiles/base/show_public/:id', to: 'profiles/base#show_public'
       get '/profiles/base/show_for_community/:id', to: 'profiles/base#show_for_community'
