@@ -23,6 +23,6 @@ class Api::V1::Profiles::AnniversaryController < Api::V1::Profiles::BaseControll
   private
   
   def answers_params
-    params.require(:answers).permit(:body1, :body2, :body3, :body4, :body5, :body6, :body7)
+    params.require(:answers).permit(:body1, :body2)
   end
 end
